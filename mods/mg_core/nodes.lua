@@ -1,3 +1,5 @@
+--core.override_item("air", {light_source=3}, {})
+
 core.register_node("mg_core:soil", {
 	description = "Soil",
 	tiles = {"mg_soil.png"},
@@ -24,6 +26,6 @@ core.register_node("mg_core:quartz", {
 
 core.register_node("mg_core:peridotite", {
 	description = "Peridotite",
-	tiles = {"mg_Peridotite.png"},
+	tiles = {"mg_peridotite.png"},
 	groups = {ground = 1, layer=4},
 })
