@@ -177,6 +177,7 @@ function mapmaker.register_tab(name, title, items)
 				"field[0.3,4.2;2.8,1.2;mapmaker_filter;;" .. esc(inv.filter) .. "]" ..
 				"listring[detached:mapmaker_" .. player_name .. ";main]" ..
 				"list[detached:mapmaker_" .. player_name .. ";main;0,0;8,4;" .. tostring(inv.start_i) .. "]" ..
+				"list[player:" .. player_name .. ";main;0,6.35;8,3;8]" ..
 				mapmaker.formspec_add, true)
 		end,
 		on_enter = function(self, player, context)

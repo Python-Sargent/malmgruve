@@ -317,9 +317,9 @@ local function rail_on_step(self, dtime)
 
 	local anim = {x=0, y=0}
 	if dir.y == -1 then
-		anim = {x=1, y=1}
-	elseif dir.y == 1 then
 		anim = {x=2, y=2}
+	elseif dir.y == 1 then
+		anim = {x=4, y=4}
 	end
 	self.object:set_animation(anim, 1, 0)
 

@@ -30,8 +30,7 @@ function core.is_mapmaker_enabled(name)
 	if name == "" then
 		return old_is_creative_enabled(name)
 	end
-	return core.check_player_privs(name, {mapmaker = true}) or
-		old_is_creative_enabled(name)
+	return core.check_player_privs(name, {mapmaker = true}) or old_is_creative_enabled(name)
 end
 
 -- For backwards compatibility:
@@ -42,6 +41,7 @@ end
 dofile(core.get_modpath("mg_mapmaker") .. "/inventory.lua")
 
 if core.is_mapmaker_enabled("") then
+	
 	core.register_on_mods_loaded(function()
 		local digtime = 0
 		local caps = {times = {digtime, digtime, digtime}, uses = 0, maxlevel = 256}

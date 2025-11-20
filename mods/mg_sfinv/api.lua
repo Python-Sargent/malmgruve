@@ -36,7 +36,7 @@ function sfinv.get_nav_fs(player, context, nav, current_idx)
 	end
 end
 
-local theme_inv = [[
+sfinv.theme_inv = [[
 		image[0,5.2;1,1;gui_hb_bg.png]
 		image[1,5.2;1,1;gui_hb_bg.png]
 		image[2,5.2;1,1;gui_hb_bg.png]
@@ -46,21 +46,20 @@ local theme_inv = [[
 		image[6,5.2;1,1;gui_hb_bg.png]
 		image[7,5.2;1,1;gui_hb_bg.png]
 		list[current_player;main;0,5.2;8,1;]
-		list[current_player;main;0,6.35;8,3;8]
-	]]
+	]] --list[current_player;main;0,6.35;8,3;8]
 
 function sfinv.make_formspec(player, context, content, show_inv, size)
 	local tmp = {
 		size or "size[8,9.1]",
 		sfinv.get_nav_fs(player, context, context.nav_titles, context.nav_idx),
-		show_inv and theme_inv or "",
+		show_inv and sfinv.theme_inv or "",
 		content
 	}
 	return table.concat(tmp, "")
 end
 
 function sfinv.get_homepage_name(player)
-	return "sfinv:crafting"
+	return "sfinv:bag"
 end
 
 function sfinv.get_formspec(player, context)
