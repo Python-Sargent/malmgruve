@@ -1,4 +1,52 @@
---core.override_item("air", {light_source=3}, {})
+--core.override_item("air", {light_source=5}, {})
+
+core.register_node("mg_core:sand", {
+	description = "Sand",
+	tiles = {
+		"mg_sand.png",
+		"mg_soil.png",
+		"mg_sand.png"
+	},
+	groups = {ground = 1, layer=0},
+})
+
+core.register_node("mg_core:bush", {
+	description = "Bush",
+	drawtype = "plantlike",
+	waving = 1,
+	--visual_scale = 1.69,
+	tiles = {"mg_bush.png"},
+	inventory_image = "mg_bush.png",
+	wield_image = "mg_bush.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	buildable_to = true,
+	groups = {diggable=1},
+	selection_box = {
+		type = "fixed",
+		fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+	},
+})
+
+core.register_node("mg_core:tall_bush", {
+	description = "Tall Bush",
+	drawtype = "plantlike",
+	waving = 1,
+	visual_scale = 1.5,
+	tiles = {"mg_tall_bush.png"},
+	inventory_image = "mg_tall_bush.png",
+	wield_image = "mg_tall_bush.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	buildable_to = true,
+	groups = {diggable=1},
+	selection_box = {
+		type = "fixed",
+		fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+	},
+})
 
 core.register_node("mg_core:soil", {
 	description = "Soil",

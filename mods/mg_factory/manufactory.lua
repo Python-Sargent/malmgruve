@@ -266,12 +266,46 @@ mg_factory.manufactory.register_machine("crank", {
     end
 })
 
-mg_factory.manufactory.register_machine("ball_mill", {
+mg_factory.manufactory.register_machine("mill", {
     description = "Ball Mill",
     mesh = "mg_ball_mill.obj",
     tiles = {"mg_machine_mechanical_frame.png", "mg_machine_mechanical_metal.png", "mg_machine_mechanical_wood.png"},
     machine = {type="user", num = 1, active = false},
     formspec = mg_factory.manufactory.press_formspec,
+    inventories = {
+        {name="src", size=1},
+        {name="dst", size=4}
+    },
+    on_inventory_put = function(pos, listname, index, stack, player)
+        if listname == "src" then
+            core.get_node_timer(pos):start(5)
+            --manufacture_item(pos, "refining")
+        end
+    end,
+    on_inventory_move = function(pos, from_list, from_index, to_list, to_index, count)
+        if to_list == "src" then
+            core.get_node_timer(pos):start(5)
+            --local stack = core.get_meta(pos):get_inventory():get_stack(to_list, to_index)
+            --manufacture_item(pos, "refining")
+        end
+    end,
+    on_timer = function(pos, elapsed, node, timeout)
+        --core.log("Timer at " .. core.pos_to_string(pos))
+        manufacture_item(pos, "refining")
+        local inv = core.get_meta(pos):get_inventory()
+        if inv:get_stack("src", 1):get_count() < 1 then
+            return false -- stop the timer if nothing is left in src
+        end
+        return true
+    end
+}, {})
+
+mg_factory.manufactory.register_machine("manufacturer", {
+    description = "Manufacturer",
+    mesh = "mg_manufacturer.obj",
+    tiles = {"mg_machine_generic_frame.png", "mg_machine_generic_metal.png", "mg_machine_generic_wood.png"},
+    machine = {type="user", num = 1, active = false},
+    formspec = mg_factory.manufactory.manufacturer_formspec,
     inventories = {
         {name="src", size=1},
         {name="dst", size=4}

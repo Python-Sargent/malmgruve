@@ -1,4 +1,4 @@
-mg_core.ores = {}
+--mg_core.ores = {}
 
 mg_core.ores.registered_ores = {}
 
@@ -57,10 +57,23 @@ mg_core.ores.register_ore = function(def, override)
 		ore_def[k] = v
 	end
 
-    mg_core.ores.registered_ores[name] = { level=def.level, name=def.name, type=def.metal or 0}
+    local ore_type = { level=def.level, name=name, type=def.type, ore=true }
+    local raw_ore_type = { level=def.level, name=def.name, type=def.type, ore=false }
+
+    mg_core.ores.registered_ores[name], mg_core.ores.registered_ores[raw] = ore_type, raw_ore_type
 
     core.register_node(name, ore_def)
     core.register_craftitem(raw, rawdef)
+end
+
+mg_core.ores.get_ores = function(y, rock)
+    local ores = {}
+    for _,v in pairs(mg_core.ores.registered_ores) do
+        if mg_core.ores.levels[v.level].node == rock then
+            table.insert(ores, v.name)
+        end
+    end
+    return ores
 end
 
 --[[mg_core.ores.register_ore({

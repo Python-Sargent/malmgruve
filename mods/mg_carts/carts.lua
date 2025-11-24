@@ -8,18 +8,65 @@ local cart_entity = {
 		visual = "mesh",
 		mesh = "mg_cart.glb",
 		visual_size = {x=10, y=10},
-		textures = {"mg_cart_wood.png", "mg_cart_frame.png"},
+		textures = {"mg_cart_wood.png", "mg_cart_frame.png", "mg_cart_wood.png"},
 	},
 	velocity = {x=0, y=0, z=0},
 	old_dir = {x=1, y=0, z=0},
 	old_pos = nil,
 	old_switch = 0,
 	railtype = nil,
-	attached_items = {}
+	attached_items = {},
+	cargo = ""
 }
 
+local function update_lvl(cart)
+	local stack = ItemStack(cart.cargo)
+
+	local texture = "mg_cart_wood.png"
+	local ore = mg_core.ores.registered_ores[stack:get_name()]
+	if ore ~= nil then
+		local nodename = mg_core.ores.levels[ore.level].node
+		local node = core.registered_nodes[nodename]
+		local item = core.registered_craftitems[stack:get_name()]
+		texture = node.tiles[1] .. "^" .. item.inventory_image
+	end
+
+	local frame = math.round((stack:get_count() / stack:get_stack_max()) * 6)
+	--core.log(frame)
+	cart.object:set_animation({x=frame, y=frame}, 1, 0)
+	cart.object:set_properties({
+		textures = {"mg_cart_wood.png", "mg_cart_frame.png", texture},
+	})
+end
+
 function cart_entity:on_rightclick(clicker)
-	--do stuff
+	local item = clicker:get_wielded_item()
+	local cargo = ItemStack(self.cargo)
+	local c_name = cargo:get_name()
+
+	local is_ore = false
+	if mg_core.ores.registered_ores[item:get_name()] ~= nil then
+		is_ore = true
+	end
+
+	if item:get_name() == "" then -- take the item from cargo and give it to the player
+		--core.log("no item, taking cargo")
+		clicker:get_inventory():add_item("main", cargo)
+		self.cargo = ""
+		update_lvl(self)
+	elseif c_name == item:get_name() and is_ore then
+		--core.log("cargo of same type, adding to cart")
+		clicker:get_inventory():remove_item("main", item)
+		cargo:set_count(cargo:get_count() + item:get_count())
+		self.cargo = c_name .. " " .. cargo:get_count()
+		update_lvl(self)
+	elseif c_name == "" and is_ore then
+		--core.log("no cargo already loaded, adding to cart")
+		clicker:get_inventory():remove_item("main", item)
+		self.cargo = item:get_name() .. " " .. item:get_count()
+		update_lvl(self)
+	end
+	--core.show_formspec(clicker:get_player_name(), "cart_inventory", cart_formspec(self, clicker))
 end
 
 function cart_entity:on_activate(staticdata, dtime_s)
@@ -33,12 +80,19 @@ function cart_entity:on_activate(staticdata, dtime_s)
 	end
 	self.railtype = data.railtype
 	self.old_dir = data.old_dir or self.old_dir
+	if data.cargo ~= nil then
+		self.cargo = data.cargo
+	else
+		self.cargo = ""
+	end
+	update_lvl(self)
 end
 
 function cart_entity:get_staticdata()
 	return core.serialize({
 		railtype = self.railtype,
-		old_dir = self.old_dir
+		old_dir = self.old_dir,
+		cargo = self.cargo
 	})
 end
 
@@ -70,6 +124,11 @@ function cart_entity:on_punch(puncher, time_from_last_punch, tool_capabilities, 
 			if not leftover:is_empty() then
 				core.add_item(self.object:get_pos(), leftover)
 			end
+		end
+		if self.cargo ~= "" then
+			local stack = ItemStack(self.cargo)
+			local leftover = inv:add_item("main", stack)
+			core.item_drop(leftover, puncher, pos)
 		end
 		self.object:remove()
 		return
@@ -314,14 +373,29 @@ local function rail_on_step(self, dtime)
 		yaw = 1
 	end
 	self.object:set_yaw(yaw * math.pi)
+	
+	local rot = 0
+	if dir.y == -1 then
+		rot = -0.75
 
+	elseif dir.y == 1 then
+		rot = 0.75
+	end
+
+	local r = self.object:get_rotation()
+	self.object:set_rotation(vector.new(rot, r.y, r.z))
+	--if rot ~= 0 then self.object:set_pos(vector.offset(self.object:get_pos(), 0, 0.5, 0)) end
+	--[[
 	local anim = {x=0, y=0}
 	if dir.y == -1 then
 		anim = {x=2, y=2}
 	elseif dir.y == 1 then
 		anim = {x=4, y=4}
 	end
+	local rot = self.object:get_rotation()
+	self.object:set_rotation(vector.new(rot.x, rot.y, rot.z))
 	self.object:set_animation(anim, 1, 0)
+	]]
 
 	if update.vel then
 		self.object:set_velocity(vel)
@@ -363,13 +437,33 @@ core.register_craftitem("mg_carts:cart", {
 		if pointed_thing.type ~= "node" then
 			return
 		end
+		local c = nil
 		if carts:is_rail(pointed_thing.under) then
-			core.add_entity(pointed_thing.under, "mg_carts:cart")
+			c = core.add_entity(pointed_thing.under, "mg_carts:cart")
 		elseif carts:is_rail(pointed_thing.above) then
-			core.add_entity(pointed_thing.above, "mg_carts:cart")
+			c = core.add_entity(pointed_thing.above, "mg_carts:cart")
 		else
 			return
 		end
+
+		local inv = core.create_detached_inventory(tostring(c:get_guid()), {
+			on_put = function(inv, listname, index, stack, player)
+				local sz = stack:get_count() / stack:get_stack_max()
+				local frame = math.round(sz * 7)
+				c:set_animation({x=frame,y=frame}, 1, 0)
+
+				return stack:get_count()
+			end,
+			on_move = function(inv, from_list, from_index, to_list, to_index, count, player)
+				local stack = inv:get_stack(from_list, from_index)
+				local sz = stack:get_count() / stack:get_stack_max()
+				local frame = math.round(sz * 7)
+				c:set_animation({x=frame,y=frame}, 1, 0)
+
+				return count
+			end,
+		})
+		inv:set_size("cargo", 1)
 
 		core.sound_play({name = "default_place_node_metal", gain = 0.5},
 			{pos = pointed_thing.above}, true)

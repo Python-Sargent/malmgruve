@@ -1,27 +1,107 @@
 
+-- Rock Types
+
+local air = core.get_content_id("air")
+local sand = core.get_content_id("mg_core:sand")
 local soil = core.get_content_id("mg_core:soil")
 local limestone = core.get_content_id("mg_core:limestone")
 local granite = core.get_content_id("mg_core:granite")
 local quartz = core.get_content_id("mg_core:quartz")
 local peridotite = core.get_content_id("mg_core:peridotite")
 
+--local bush = core.get_content_id("mg_core:bush")
+
 local levels = {
-    {0, soil},
-    {-100, limestone},
+    {0, sand},
+    {-1, soil},
+    {-10, limestone},
     {-250, granite},
     {-500, quartz},
-    {-1000, peridotite}
+    {-1000, peridotite},
+    {-32000, peridotite},
+}
+
+-- Ores
+
+local aluminum = core.get_content_id("mg_core:limestone_with_aluminum")
+local iron = core.get_content_id("mg_core:limestone_with_iron")
+local azurite = core.get_content_id("mg_core:limestone_with_azurite")
+local manganese = core.get_content_id("mg_core:limestone_with_manganese")
+local halite = core.get_content_id("mg_core:limestone_with_halite")
+local coal = core.get_content_id("mg_core:limestone_with_coal")
+
+local lead = core.get_content_id("mg_core:granite_with_lead")
+local copper = core.get_content_id("mg_core:granite_with_copper")
+local cinnabar = core.get_content_id("mg_core:granite_with_cinnabar")
+local argentite = core.get_content_id("mg_core:granite_with_argentite")
+local bornite = core.get_content_id("mg_core:granite_with_bornite")
+
+local molybdenite = core.get_content_id("mg_core:quartz_with_molybdenite")
+local tungsten = core.get_content_id("mg_core:quartz_with_tungsten")
+local nickel = core.get_content_id("mg_core:quartz_with_nickel")
+local cobalt = core.get_content_id("mg_core:quartz_with_cobalt")
+local gold = core.get_content_id("mg_core:quartz_with_gold")
+
+local chromium = core.get_content_id("mg_core:peridotite_with_chromium")
+local platinum = core.get_content_id("mg_core:peridotite_with_platinum")
+local graphite = core.get_content_id("mg_core:peridotite_with_graphite")
+
+local opal = core.get_content_id("mg_core:limestone_with_opal")
+local emerald = core.get_content_id("mg_core:limestone_with_emerald")
+
+local topaz = core.get_content_id("mg_core:granite_with_topaz")
+local tourmaline = core.get_content_id("mg_core:granite_with_tourmaline")
+
+local ruby = core.get_content_id("mg_core:quartz_with_ruby")
+local sapphire = core.get_content_id("mg_core:quartz_with_sapphire")
+
+local diamond = core.get_content_id("mg_core:peridotite_with_diamond")
+local olivine = core.get_content_id("mg_core:peridotite_with_olivine")
+
+local ores = {
+    --{0, limestone},
+    {-20, aluminum},
+    {-80, iron},
+    {-100, azurite},
+    {-120, opal},
+    {-140, manganese},
+    {-160, halite},
+    {-170, coal},
+    {-190, emerald},
+
+    {-250, lead},
+    {-270, copper},
+    {-310, cinnabar},
+    {-330, topaz},
+    {-360, argentite},
+    {-390, bornite},
+    {-450, tourmaline},
+
+    {-500, molybdenite},
+    {-590, tungsten},
+    {-600, nickel},
+    {-650, ruby},
+    {-700, cobalt},
+    {-810, gold},
+    {-900, sapphire},
+
+    {-1000, chromium},
+    {-1100, platinum},
+    {-1200, diamond},
+    {-1400, graphite},
+    {-1500, olivine},
+    {-32000, olivine}
 }
 
 local function getLevel(y, lvls)
-    local cid = core.get_content_id("air")
+    local cid = air
     --local bestKey = -2000
 
     for i, entry in ipairs(lvls) do
         local key = entry[1]
         local value = entry[2]
 
-        if key >= y and y >= levels[i+1][1] then
+        if key >= y and lvls[i+1] ~= nil and y >= lvls[i+1][1] then
             --bestKey = key
             cid = value
         end
@@ -34,12 +114,54 @@ core.register_on_generated(function(vm, minp, maxp, seed)
     local emin, emax = vm:get_emerged_area()
     local area = VoxelArea(emin, emax)
     local data = vm:get_data()
+    local size = {x=math.abs(maxp.x-minp.x), y=math.abs(maxp.y-minp.y), z=math.abs(maxp.z-minp.z)}
+    local noise_map = core.get_value_noise({
+        offset = 0,
+        scale = 1,
+        spread = {x = 10, y = 10, z = 0},
+        seed = 1,
+        octaves = 3,
+        persist = 0.5,
+        lacunarity = 2.0,
+    }) -- z is ommitted for 2D noise
 
+    local m_pos = {z=minp.x,y=minp.y,x=minp.z}
+
+    local ore_map = core.get_value_noise_map({
+        offset = 0,
+        scale = 0.8,
+        spread = {x = 3, y = 3, z = 3},
+        seed = 1,
+        octaves = 1,
+        persist = 0.5,
+        lacunarity = 2,
+        flags = {
+            eased = true,
+            absvalue = false,
+            defaults = false
+        }
+    }, {x=80, y=80, z=80})
+    local ore_noise_m = ore_map:get_3d_map(m_pos)
+
+    local ly = 0
     for y = minp.y, maxp.y do
+        ly = ly + 1
+        local lz = 0
         for z = minp.z, maxp.z do
+            lz = lz + 1
             local vi = area:index(minp.x, y, z)
+            local lx = 0
             for x = minp.x, maxp.x do
-                data[vi] = getLevel(y, levels)
+                lx = lx + 1
+                local rand = noise_map:get_2d(vector.new(z, x, 0))
+                local rock = getLevel(y + rand*2, levels)
+                local ore_noise = ore_noise_m[lx][ly][lz]
+                local ore = getLevel(y + rand*2, ores)
+                if ore_noise ~= nil and ore_noise > 0.6 and ore ~= air then
+                    rock = ore
+                end
+                --local ores = mg_core.ores.get_ores(y, rock)
+                data[vi] = rock
                 vi = vi + 1
             end
         end

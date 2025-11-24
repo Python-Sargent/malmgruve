@@ -4,6 +4,7 @@ core.register_craftitem("mg_core:bag", {
     inventory_image = "mg_bag_inv.png"
 })
 
+--[[
 local bag_entity = {
 	initial_properties = {
 		physical = false,
@@ -19,7 +20,11 @@ local bag_entity = {
 
 core.register_entity("mg_core:bag", bag_entity)
 
---[[
+core.register_on_joinplayer(function(player, last_login)
+    local bag = core.add_entity(player:get_pos(), "mg_core:bag", nil)
+    bag:set_attach(player, "body", vector.new(0, 0, -1), vector.new(0, 0, 0))
+end)
+
 core.register_on_leaveplayer(function(player, timed_out)
     local attached = player:get_children()
     for _,v in pairs(attached) do

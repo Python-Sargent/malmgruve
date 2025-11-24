@@ -47,9 +47,19 @@ sfinv.register_page("sfinv:bag", {
 		local inv = player:get_inventory()
 		local bagslot = inv:get_stack("bag", 1)
 		if bagslot:get_name() == "mg_core:bag" then
-			player:get_inventory():set_size("main", 8*4)
+			inv:set_size("main", 8*4)
 		elseif not creative then
-			player:get_inventory():set_size("main", 8)
+			local main = inv:get_list("main")
+			local overflow = {unpack(main, 8+1)}
+			inv:set_size("main", 8)
+			local drop = {}
+			for _,v in pairs(overflow) do
+				local extra = inv:add_item("main", v)
+				table.insert(drop, extra)
+			end
+			for _,v in pairs(drop) do
+				core.item_drop(v, player, player:get_pos())
+			end
 		end
 	end
 })
