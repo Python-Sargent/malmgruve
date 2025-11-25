@@ -55,6 +55,32 @@ mg_factory.manufactory.smelter_formspec = function(pos)
     return formspec
 end
 
+mg_factory.manufactory.manufacturer_formspec = function(pos)
+    local m_recipes = {}
+    for k,v in pairs(mg_factory.recipes) do
+        if v.machine == "manufacturing" then
+            table.insert(m_recipes, v)
+        end
+    end
+    local manufactures = ""
+    for i,v in ipairs(m_recipes) do
+        manufactures = manufactures .. "item_image_button["..i..",0;1,1;"..v.result..";"..v.result..";]"
+    end
+    local inv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
+    local formspec = "size[8,8.5]"..
+    manufactures ..
+    "field[0,0;0,0;pos;;"..core.pos_to_string(pos).."]" ..
+    "list[" .. inv ..";src;1,2;2,2;]"..
+    "list[" .. inv ..";dst;5,2;2,2;]"..
+    "list[current_player;main;0,4.25;8,1;]"..
+    "list[current_player;main;0,5.5;8,3;8]" ..
+    "listring[" .. inv ..";dst]"..
+    "listring[current_player;main]" ..
+    "listring[" .. inv ..";src]"..
+    "listring[current_player;main]"
+    return formspec
+end
+
 mg_factory.manufactory.register_machine = function(name, def, overrides)
     local function can_dig(pos, player)
         local inv = core.get_meta(pos):get_inventory()
@@ -122,6 +148,7 @@ mg_factory.manufactory.register_machine = function(name, def, overrides)
         allow_metadata_inventory_take = allow_metadata_inventory_take,
         on_metadata_inventory_put = def.on_inventory_put or function() end,
         on_metadata_inventory_move = def.on_inventory_move or function() end,
+        on_receive_fields = def.on_receive_fields or function() end,
         on_timer = def.on_timer or function() end
     }
 
@@ -206,12 +233,55 @@ local manufacture_item = function(pos, type)
     local product = mg_factory.manufacture(stack:get_name(), type)
     if product == nil then return end
     local inv = core.get_meta(pos):get_inventory()
-    inv:add_item("dst", ItemStack(product.result .. " " .. product.amount))
+    inv:add_item("dst", ItemStack(product.result, product.amount))
     stack:set_count(product.amount)
     inv:remove_item("src", stack)
     if product.left ~= nil then
-        inv:add_item("src", ItemStack(product.left .. " " .. product.amount))
+        inv:add_item("src", ItemStack(product.left, product.amount))
     end
+end
+
+local get_items = function(items, inv)
+    local has_items = true
+    for _,v in pairs(items) do
+        if not inv:contains_item("src", ItemStack(v)) then
+            has_items = false
+        end
+    end
+    if has_items then
+        for _,v in pairs(items) do
+            inv:remove_item("src", ItemStack(v))
+        end
+    end
+    return has_items
+end
+
+local m_manufacture = function(pos, input)
+    local meta = core.get_meta(pos)
+    local inv = meta:get_inventory()
+
+    local machines = get_nearby_machines(pos)
+    local discharge = nil
+    for _,v in pairs(machines) do
+        local n = core.get_node(v)
+        if mg_factory.manufactory.machines[n.name].num == 2 then
+            discharge = v
+            break
+        end
+    end
+    if discharge == nil then return false end -- no power sources nearby
+    local dmeta = core.get_meta(discharge)
+    if dmeta:get_int("power") < 5 then return true end -- not enough power
+    dmeta:set_int("power", dmeta:get_int("power") - 5)
+
+    local product = mg_factory.manufacture(input, "manufacturing")
+    if product == nil then return false end
+
+    local success = get_items(product.requires, inv)
+    if success then
+        inv:add_item("dst", ItemStack(product.result, product.amount))
+    end
+    return success
 end
 
 mg_factory.manufactory.register_machine("roller", {
@@ -303,36 +373,45 @@ mg_factory.manufactory.register_machine("mill", {
 mg_factory.manufactory.register_machine("manufacturer", {
     description = "Manufacturer",
     mesh = "mg_manufacturer.obj",
-    tiles = {"mg_machine_generic_frame.png", "mg_machine_generic_metal.png", "mg_machine_generic_wood.png"},
+    tiles = {"mg_machine_generic_frame.png", "mg_machine_generic_metal.png"},
     machine = {type="user", num = 1, active = false},
     formspec = mg_factory.manufactory.manufacturer_formspec,
     inventories = {
-        {name="src", size=1},
+        {name="src", size=4},
         {name="dst", size=4}
     },
-    on_inventory_put = function(pos, listname, index, stack, player)
-        if listname == "src" then
-            core.get_node_timer(pos):start(5)
-            --manufacture_item(pos, "refining")
-        end
-    end,
-    on_inventory_move = function(pos, from_list, from_index, to_list, to_index, count)
-        if to_list == "src" then
-            core.get_node_timer(pos):start(5)
-            --local stack = core.get_meta(pos):get_inventory():get_stack(to_list, to_index)
-            --manufacture_item(pos, "refining")
-        end
-    end,
     on_timer = function(pos, elapsed, node, timeout)
         --core.log("Timer at " .. core.pos_to_string(pos))
-        manufacture_item(pos, "refining")
-        local inv = core.get_meta(pos):get_inventory()
-        if inv:get_stack("src", 1):get_count() < 1 then
-            return false -- stop the timer if nothing is left in src
-        end
-        return true
-    end
+        local meta = core.get_meta(pos)
+        local item =  meta:get_string("mod") .. ":" .. meta:get_string("item")
+        --core.log("Manufacturer Preset: " .. tostring(item))
+        return m_manufacture(pos, item)
+    end,
 }, {})
+
+core.register_on_player_receive_fields(function(player, formname, fields)
+    if formname == "manufacturer" then
+        local item = nil
+        for k,v in pairs(fields) do
+            --core.log(tostring(k) .. " <-> " .. tostring(v))
+            if k ~= "quit"then
+                item = k
+            end
+        end
+        local pos = nil
+        if fields.pos then
+            pos = core.string_to_pos(fields.pos)
+            --core.log("Formspec Pos: " .. fields.pos)
+        else
+            return -- no positon so we can't perform operations on nodemeta
+        end
+        --core.log("Selected: " .. tostring(item))
+        local itm = string.split(item, ":") -- meta doesn't allow you to store the colon (:) charactor for some reason
+        core.get_meta(pos):set_string("mod", itm[1])
+        core.get_meta(pos):set_string("item", itm[2])
+        core.get_node_timer(pos):start(1)
+    end
+end)
 
 --[[
 core.register_node("mg_factory:manufactory", {

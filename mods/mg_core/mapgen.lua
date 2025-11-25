@@ -3,17 +3,19 @@
 
 local air = core.get_content_id("air")
 local sand = core.get_content_id("mg_core:sand")
+local silt = core.get_content_id("mg_core:silt")
 local soil = core.get_content_id("mg_core:soil")
 local limestone = core.get_content_id("mg_core:limestone")
 local granite = core.get_content_id("mg_core:granite")
 local quartz = core.get_content_id("mg_core:quartz")
 local peridotite = core.get_content_id("mg_core:peridotite")
 
---local bush = core.get_content_id("mg_core:bush")
+local bush = core.get_content_id("mg_core:bush")
+local tall_bush = core.get_content_id("mg_core:tall_bush")
 
 local levels = {
     {0, sand},
-    {-1, soil},
+    {-4, soil},
     {-10, limestone},
     {-250, granite},
     {-500, quartz},
@@ -120,8 +122,28 @@ core.register_on_generated(function(vm, minp, maxp, seed)
         scale = 1,
         spread = {x = 10, y = 10, z = 0},
         seed = 1,
-        octaves = 3,
+        octaves = 1,
         persist = 0.5,
+        lacunarity = 2.0,
+    }) -- z is ommitted for 2D noise
+
+    local noise_map_2 = core.get_value_noise({
+        offset = 0,
+        scale = 5,
+        spread = {x = 20, y = 20, z = 0},
+        seed = 1,
+        octaves = 5,
+        persist = 0.5,
+        lacunarity = 2.0,
+    }) -- z is ommitted for 2D noise
+
+    local feature_map = core.get_value_noise({
+        offset = 0,
+        scale = 0.6,
+        spread = {x = 2, y = 2, z = 0},
+        seed = 1,
+        octaves = 2,
+        persist = 0.4,
         lacunarity = 2.0,
     }) -- z is ommitted for 2D noise
 
@@ -153,14 +175,29 @@ core.register_on_generated(function(vm, minp, maxp, seed)
             local lx = 0
             for x = minp.x, maxp.x do
                 lx = lx + 1
-                local rand = noise_map:get_2d(vector.new(z, x, 0))
+                local rand = noise_map:get_2d(vector.new(z, x, 0))/2 + noise_map_2:get_2d(vector.new(z, x, 0))
                 local rock = getLevel(y + rand*2, levels)
-                local ore_noise = ore_noise_m[lx][ly][lz]
-                local ore = getLevel(y + rand*2, ores)
-                if ore_noise ~= nil and ore_noise > 0.6 and ore ~= air then
-                    rock = ore
+                if rock == air then
+                    local below = getLevel(y + rand*2 - 1, levels)
+                    if below == sand then
+                        local r = feature_map:get_2d(vector.new(z, x, 0))
+                        if r > 0.75 then
+                            rock = tall_bush
+                        elseif r > 0.5 then
+                            rock = bush
+                        end
+                    end
+                    if y + rand*2 < -5 then
+                        rock = silt
+                    end
+                else
+                    local ore_noise = ore_noise_m[lx][ly][lz]
+                    local ore = getLevel(y + rand*2, ores)
+                    if ore_noise ~= nil and ore_noise > 0.6 and ore ~= air then
+                        rock = ore
+                    end
                 end
-                --local ores = mg_core.ores.get_ores(y, rock)
+
                 data[vi] = rock
                 vi = vi + 1
             end

@@ -25,12 +25,28 @@ for _, v in pairs(mg_core.ores.registered_ores) do
     })
 end
 
-mg_factory.register_recipe("mg_core:manufacturer", {
-    type = "structured",
+mg_factory.register_recipe("mg_factory:manufacturer", {
+    type = "specific",
     amount = 1,
     machine = "manufacturing",
-    requires = {"mg_core:raw_aluminum", "mg_core:raw_iron"},
-    result = "mg_core:manufacturer"
+    requires = {"mg_core:aluminum 2", "mg_core:iron_sheet"},
+    result = "mg_factory:manufacturer"
+})
+
+mg_factory.register_recipe("mg_carts:cart", {
+    type = "specific",
+    amount = 1,
+    machine = "manufacturing",
+    requires = {"mg_core:iron 2", "mg_core:iron_sheet 2"},
+    result = "mg_carts:cart"
+})
+
+mg_factory.register_recipe("mg_carts:rail_straight", {
+    type = "specific",
+    amount = 4,
+    machine = "manufacturing",
+    requires = {"mg_core:iron 2"},
+    result = "mg_carts:rail_straight"
 })
 
 --[[
@@ -56,8 +72,8 @@ mg_factory.manufacture = function(input, machine)
     if recipe ~= nil and recipe.machine == machine then
         if recipe.type == "single" then
             return {result = recipe.result, amount = recipe.amount, left = recipe.replacements}
-        elseif recipe.type == "structured" then
-            return {result = recipe.result, amount = recipe.amount, left = recipe.replacements}
+        elseif recipe.type == "specific" then
+            return {result = recipe.result, amount = recipe.amount, left = recipe.replacements, requires=recipe.requires}
         end
     end
 end

@@ -1,5 +1,17 @@
 mg_mining.explosives = {}
 
+local cid_data = {}
+minetest.register_on_mods_loaded(function()
+	for name, def in pairs(minetest.registered_nodes) do
+		cid_data[minetest.get_content_id(name)] = {
+			name = name,
+			drops = def.drops,
+			flammable = def.groups and (def.groups.flammable or 0) ~= 0,
+			on_blast = def.on_blast,
+		}
+	end
+end)
+
 local function add_drop(drops, item)
 	item = ItemStack(item)
 	local name = item:get_name()
@@ -16,8 +28,8 @@ local function add_effects(pos, radius)
 		pos = pos,
 		velocity = vector.new(),
 		acceleration = vector.new(),
-		expirationtime = 0.4,
-		size = radius * 10,
+		expirationtime = 0.1,
+		size = radius * 30,
 		collisiondetection = false,
 		vertical = false,
 		texture = {name = "mg_fire_particle.png"},
@@ -117,11 +129,21 @@ local function explode(pos, radius)
                     local p = {x = pos.x + x, y = pos.y + y, z = pos.z + z}
                     if cid ~= c_air and cid ~= c_ignore then
                         if c_air ~= data[vi] then
+                            if data[vi] == core.get_content_id("mg_mining:dynamite") then
+                                data[vi] = c_air
+                                goto continue
+                            end
+                            local def = cid_data[cid]
+                            local node_drops = core.get_node_drops(def.name, "")
+                            for _, item in pairs(node_drops) do
+                                add_drop(drops, item)
+                            end
                             add_drop(drops, core.registered_nodes[cid])
                             data[vi] = c_air
                             if has_meta[vi] then
                                 core.get_meta(p):from_table(nil)
                             end
+                            ::continue::
                         end
                     end
                 end

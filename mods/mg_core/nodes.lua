@@ -2,11 +2,13 @@
 
 core.register_node("mg_core:sand", {
 	description = "Sand",
-	tiles = {
-		"mg_sand.png",
-		"mg_soil.png",
-		"mg_sand.png"
-	},
+	tiles = {"mg_sand.png"},
+	groups = {ground = 1, layer=0},
+})
+
+core.register_node("mg_core:silt", {
+	description = "Silt",
+	tiles = {"mg_silt.png"},
 	groups = {ground = 1, layer=0},
 })
 
@@ -76,4 +78,10 @@ core.register_node("mg_core:peridotite", {
 	description = "Peridotite",
 	tiles = {"mg_peridotite.png"},
 	groups = {ground = 1, layer=4},
+})
+
+core.register_node("mg_core:brick", {
+	description = "Brick",
+	tiles = {"mg_brick.png"},
+	groups = {diggable=1, layer=1},
 })

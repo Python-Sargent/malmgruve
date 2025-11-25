@@ -60,32 +60,32 @@ core.register_on_joinplayer(function(player)
 
 	player:set_clouds({
 		density = 0.9,
-		color = "#aaaabbdd",
-		ambient = "#ffffff",
-		shadow = "#aaaaaa",
-		thickness = 128,
+		color = "#efeedd",
+		ambient = "#efeeea",
+		shadow = "#eeddbb",
+		thickness = 256,
 		speed = {x=2, y=2},
-		height = 120
+		height = 50
 	})
 	player:set_sky({
 		type = "regular",
 		clouds = true,
 		sky_color = {
-			night_sky = "#666677",
-			night_horizon = "#887799",
-			day_horizon = "#dfddff",
-			day_sky = "#ddddff",
-			dawn_sky = "#eeddff",
-			dawn_horizon = "#eeedff",
+			night_sky = "#776644",
+			night_horizon = "#997777",
+			day_horizon = "#ffdddd",
+			day_sky = "#eeeddd",
+			dawn_sky = "#ddccaa",
+			dawn_horizon = "#ddaaaa",
 			indoors = "#aaaaaa",
-			fog_sun_tint = "#ddddff",
-			fog_moon_tint = "#ddddff",
+			fog_sun_tint = "#ffdddd",
+			fog_moon_tint = "#998866",
 			fog_tint_type = "custom"
 		},
 		fog = {
-			fog_start = 0.2,
-			fog_distance = 40,
-			fog_color = "#ddddff00"
+			fog_start = 0.5,
+			fog_distance = 50,
+			fog_color = "#ddccaa00"
 		}
 	})
 	player:set_lighting({exposure = {exposure_correction = 0.5}, saturation = 1.2})
