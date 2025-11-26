@@ -30,6 +30,27 @@ local initial_items = {
 	"mg_factory:manufacturer"
 }
 
+local welcome_formspec = function(player)
+	local content = "<center><style color='#aaccff' size='18'><b>Hello " .. player:get_player_name() .. ", welcome to Malmgruve.</b></style></center>" ..
+	"Malmgruve is a progression mining game, made for the 2025 Luanti Game Jam" ..
+	"\n\n<img name='malmgruve.png'> <style color='#aaccff' size='11'>by SuperStarSonic</style>\n\n"
+	local i = 4
+	--content = content .. "<normal> </normal>"
+
+	local fog = core.settings:get_bool("enable_fog")
+	if not fog then
+		content = content .. "<style color='#eeaaaa'>Malmgruve works best with <style color='#ff5555'>fog enabled</style>, please enable fog in your settings.</style>\n"
+		i = i+1
+	end
+
+	local formspec = "size[10,8]allow_close[false]"..
+	"scroll_container[0,0;10,8;scrollbar;vertical;]" ..
+	"hypertext[0.5,0;9.5,"..i..";content;"..content.."]" ..
+	"scroll_container_end[]" ..
+	"button_exit[3,7.5;4,1;exit;Continue to Game]"
+	return formspec
+end
+
 core.register_on_newplayer(function(player)
 	local inv = player:get_inventory()
 	for _,v in pairs(initial_items) do
@@ -39,6 +60,7 @@ end)
 
 -- GUI related stuff (from MTG defualt mod)
 core.register_on_joinplayer(function(player)
+	core.show_formspec(player:get_player_name(), "welcome", welcome_formspec(player))
 	local inv = player:get_inventory()
 	if inv:get_size("bag") ~= 1 then inv:set_size("bag", 1) end
 
