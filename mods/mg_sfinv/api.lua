@@ -51,6 +51,7 @@ sfinv.theme_inv = [[
 function sfinv.make_formspec(player, context, content, show_inv, size)
 	local tmp = {
 		size or "size[8,9.1]",
+		"formspec_version[10]",
 		sfinv.get_nav_fs(player, context, context.nav_titles, context.nav_idx),
 		show_inv and sfinv.theme_inv or "",
 		content

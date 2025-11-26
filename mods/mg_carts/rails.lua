@@ -188,3 +188,7 @@ core.register_node("mg_carts:rail_incline", {
     attached_node = true,
 	groups = {rail=1, diggable=1, not_in_creative_inventory=1},
 })
+
+carts.railparams["mg_carts:rail_straight"] = {acceleration=1}
+carts.railparams["mg_carts:rail_curved"] = {acceleration=1}
+carts.railparams["mg_carts:rail_incline"] = {acceleration=1}

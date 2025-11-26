@@ -1,6 +1,7 @@
 --mg_core.ores = {}
 
 mg_core.ores.registered_ores = {}
+mg_core.ores.registered_raw = {}
 
 mg_core.ores.levels = {
     [0] = {node="mg_core:soil", name="soil"},
@@ -61,6 +62,7 @@ mg_core.ores.register_ore = function(def, override)
     local raw_ore_type = { level=def.level, name=def.name, type=def.type, ore=false }
 
     mg_core.ores.registered_ores[name], mg_core.ores.registered_ores[raw] = ore_type, raw_ore_type
+    mg_core.ores.registered_raw[raw] = raw_ore_type
 
     core.register_node(name, ore_def)
     core.register_craftitem(raw, rawdef)

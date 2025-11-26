@@ -5,24 +5,28 @@ mg_factory.register_recipe = function(name, def)
     mg_factory.recipes[name] = def
 end
 
-for _, v in pairs(mg_core.ores.registered_ores) do
-    mg_factory.register_recipe("mg_core:" .. v.name, {
-        type = "single",
-        amount = 1,
-        machine = "pressing",
-        requires = {"mg_core:" .. v.name},
-        result = "mg_core:" .. v.name .. "_sheet"
-    })
+for _, v in pairs(mg_core.ores.registered_raw) do
+    if v.type == "metal" then
+        mg_factory.register_recipe("mg_core:" .. v.name, {
+            type = "single",
+            amount = 1,
+            machine = "pressing",
+            requires = {"mg_core:" .. v.name},
+            result = "mg_core:" .. v.name .. "_sheet"
+        })
+    end
 end
 
-for _, v in pairs(mg_core.ores.registered_ores) do
-    mg_factory.register_recipe("mg_core:raw_" .. v.name, {
-        type = "single",
-        amount = 1,
-        machine = "refining",
-        requires = {"mg_core:raw_" .. v.name},
-        result = "mg_core:" .. v.name
-    })
+for _, v in pairs(mg_core.ores.registered_raw) do
+    if v.type == "metal" then
+        mg_factory.register_recipe("mg_core:raw_" .. v.name, {
+            type = "single",
+            amount = 1,
+            machine = "refining",
+            requires = {"mg_core:raw_" .. v.name},
+            result = "mg_core:" .. v.name
+        })
+    end
 end
 
 mg_factory.register_recipe("mg_factory:manufacturer", {

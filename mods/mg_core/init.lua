@@ -32,8 +32,17 @@ local initial_items = {
 
 local welcome_formspec = function(player)
 	local content = "<center><style color='#aaccff' size='18'><b>Hello " .. player:get_player_name() .. ", welcome to Malmgruve.</b></style></center>" ..
-	"Malmgruve is a progression mining game, made for the 2025 Luanti Game Jam" ..
-	"\n\n<img name='malmgruve.png'> <style color='#aaccff' size='11'>by SuperStarSonic</style>\n\n"
+	"Malmgruve is a progression mining game, made for the 2025 Luanti Game Jam\n\n" ..
+	"<big>How to play:</big><style color='#aaddff' font='mono'>" ..
+	"\n* Recipes can be found in your inventory" ..
+	"\n* Machines must be powered by a generator which stores power units" ..
+	"\n<item name='mg_factory:crank' width='64' height='64'> ... <style size='24' color='gray'>Mechanical Crank: 100 Power Units</style>" ..
+	"\n* Carts can be filled/emptied by rightlicking with ore or an empty hand respectively" ..
+	"\n* Carts can be pushed by punching them, or stopped if they are already moving" ..
+	"\n* Bags can be equipped to give you more inventory space (see the slot in the top-right of your inventory)" ..
+	"\n* The currency in Malmgruve (Kolro) can be used to by utilites such as explosives and bags" ..
+	"\n* You can sell Ores, Machines, and refined Materials for Kolro" ..
+	"</style>\n\n<img name='malmgruve.png'> <style color='#aaccff' size='11'>by SuperStarSonic</style>\n\n"
 	local i = 4
 	--content = content .. "<normal> </normal>"
 
@@ -43,27 +52,73 @@ local welcome_formspec = function(player)
 		i = i+1
 	end
 
-	local formspec = "size[10,8]allow_close[false]"..
-	"scroll_container[0,0;10,8;scrollbar;vertical;]" ..
-	"hypertext[0.5,0;9.5,"..i..";content;"..content.."]" ..
-	"scroll_container_end[]" ..
+	local formspec = "size[10,8]allow_close[false]formspec_version[10]"..
+	"hypertext[0.5,0;9.5,"..(i*2)..";content;"..content.."]" ..
 	"button_exit[3,7.5;4,1;exit;Continue to Game]"
 	return formspec
 end
+
+--[[
+"scroll_container[0,5;10,"..tostring(i*2)..";scroll;vertical;]" ..
+"hypertext[0.5,0;9.5,"..i..";content;"..warns.."]" ..
+"scrollbar[10.25,-2;0.25,"..i..";vertical;scroll;]" ..
+"scroll_container_end[]" ..
+]]
 
 core.register_on_newplayer(function(player)
 	local inv = player:get_inventory()
 	for _,v in pairs(initial_items) do
 		inv:add_item("main", ItemStack(v))
 	end
+	local meta = player:get_meta()
+	meta:set_int("kolro", 100) -- give the player 100 intial kolro
+	core.show_formspec(player:get_player_name(), "welcome", welcome_formspec(player))
 end)
 
--- GUI related stuff (from MTG defualt mod)
+local step = 0
+
+core.register_globalstep(function(dtime)
+	step = step + dtime
+	if step >= 1 then
+		step = 0
+		local players = core.get_connected_players()
+		for k,v in pairs(players) do
+			local pos = v:get_pos()
+			if pos.y > -10 then
+				core.add_particlespawner({
+					amount = 10000,
+					time = 1,
+					collisiondetection = true,
+					object_collision = true,
+
+					pos = {
+						min = vector.new(pos.x-16,pos.y+16,pos.z-16),
+						max = vector.new(pos.x+16,-10,pos.z+16),
+						bias = 0
+					},
+			
+					vel = {
+						min = vector.new(-2, -5, -20),
+						max = vector.new(2, 10, -5),
+						bias = 0
+					},
+			
+					acc = vector.new(0, -2, -2),
+					size = { min = 0.125, max = 0.5 },
+					exptime = { min = 0.5, max = 1 },
+					glow = 2,
+					texture = "mg_dust.png"
+				})
+			end
+		end
+	end
+end)
+
 core.register_on_joinplayer(function(player)
-	core.show_formspec(player:get_player_name(), "welcome", welcome_formspec(player))
 	local inv = player:get_inventory()
 	if inv:get_size("bag") ~= 1 then inv:set_size("bag", 1) end
 
+	-- GUI related stuff (from MTG defualt mod)
 	local formspec = [[
 			bgcolor[#080808BB;true]
 			listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF] ]]

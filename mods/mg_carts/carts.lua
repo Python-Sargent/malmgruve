@@ -109,8 +109,13 @@ function cart_entity:on_punch(puncher, time_from_last_punch, tool_capabilities, 
 		if vector.equals(cart_dir, {x=0, y=0, z=0}) then
 			return
 		end
-		self.velocity = vector.multiply(cart_dir, 2)
-		self.punched = true
+		if not vector.equals(self.velocity, vector.zero()) then -- stop the cart if it's moving
+			self.velocity = vector.zero()
+			self.punched = false
+		else -- cart can only be pushed from a stop
+			self.velocity = vector.multiply(cart_dir, 2)
+			self.punched = true
+		end
 		return
 	end
 	-- Player digs cart by sneak-punch
@@ -140,24 +145,30 @@ function cart_entity:on_punch(puncher, time_from_last_punch, tool_capabilities, 
 		end
 	end]]
 
-	local punch_dir = carts:velocity_to_dir(puncher:get_look_dir())
-	punch_dir.y = 0
-	local cart_dir = carts:get_rail_direction(pos, punch_dir, nil, nil, self.railtype)
-	if vector.equals(cart_dir, {x=0, y=0, z=0}) then
-		return
-	end
+	if not vector.equals(self.velocity, vector.zero()) then
+		self.old_dir = self.velocity
+		self.velocity = vector.zero()
+		self.punched = false
+	else
+		local punch_dir = carts:velocity_to_dir(puncher:get_look_dir())
+		punch_dir.y = 0
+		local cart_dir = carts:get_rail_direction(pos, punch_dir, nil, nil, self.railtype)
+		if vector.equals(cart_dir, {x=0, y=0, z=0}) then
+			return
+		end
 
-	local punch_interval = 1
-	-- Faulty tool registrations may cause the interval to be set to 0 !
-	if tool_capabilities and (tool_capabilities.full_punch_interval or 0) > 0 then
-		punch_interval = tool_capabilities.full_punch_interval
-	end
-	time_from_last_punch = math.min(time_from_last_punch or punch_interval, punch_interval)
-	local f = 2 * (time_from_last_punch / punch_interval)
+		local punch_interval = 1
+		-- Faulty tool registrations may cause the interval to be set to 0 !
+		if tool_capabilities and (tool_capabilities.full_punch_interval or 0) > 0 then
+			punch_interval = tool_capabilities.full_punch_interval
+		end
+		time_from_last_punch = math.min(time_from_last_punch or punch_interval, punch_interval)
+		local f = 2 * (time_from_last_punch / punch_interval)
 
-	self.velocity = vector.multiply(cart_dir, f)
-	self.old_dir = cart_dir
-	self.punched = true
+		self.velocity = vector.multiply(cart_dir, f)
+		self.old_dir = cart_dir
+		self.punched = true
+	end
 end
 
 local function rail_on_step_event(handler, obj, dtime)
