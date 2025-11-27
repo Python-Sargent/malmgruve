@@ -1,4 +1,4 @@
---core.override_item("air", {light_source=5}, {})
+core.override_item("air", {light_source=5}, {})
 
 core.register_node("mg_core:sand", {
 	description = "Sand",
