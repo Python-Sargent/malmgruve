@@ -1,4 +1,4 @@
-core.override_item("air", {light_source=5}, {})
+core.override_item("air", {light_source=5}, {}) -- silly workaround to stop there from being low light levels
 
 core.register_node("mg_core:sand", {
 	description = "Sand",

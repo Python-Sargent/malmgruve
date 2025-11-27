@@ -90,7 +90,7 @@ local shop_formspec = function(player, context, selling)
     
     return sfinv.make_formspec(player, context, "image[6.5,0;0.5,0.5;mg_kolro.png;]" ..
     "hypertext[7.25,0.1;5,1;kolro;<style color='gold' size='16'><b>"..money.." Klo</b></style>]" ..
-    "field[5,4.25;3.5,1;filter;Search;]" ..
+    "field[5,4.25;3.5,1;filter;Search;"..meta:get_string("shop_filter").."]" ..
     "field_close_on_enter[filter;false]" ..
     "scroll_container[0,0;8.5,6;scroll;vertical;0.2]" ..
     "scrollbar[8,0;1,"..p..";vertical;scroll;"..meta:get_int("shop_scroll").."]" ..
