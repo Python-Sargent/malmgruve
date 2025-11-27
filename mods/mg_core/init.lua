@@ -77,6 +77,8 @@ end)
 
 local step = 0
 
+local ps = {}
+
 core.register_globalstep(function(dtime)
 	step = step + dtime
 	if step >= 1 then
@@ -109,6 +111,48 @@ core.register_globalstep(function(dtime)
 					glow = 2,
 					texture = "mg_dust.png"
 				})
+				if ps[v:get_player_name()] == nil then ps[v:get_player_name()] = true end
+				if ps[v:get_player_name()] == true then
+					v:set_sky({
+						type = "regular",
+						clouds = true,
+						sky_color = {
+							night_sky = "#776644",
+							night_horizon = "#997777",
+							day_horizon = "#ffdddd",
+							day_sky = "#eeeddd",
+							dawn_sky = "#ddccaa",
+							dawn_horizon = "#ddaaaa",
+							indoors = "#aaaaaa",
+							fog_sun_tint = "#ffdddd",
+							fog_moon_tint = "#998866",
+							fog_tint_type = "custom"
+						},
+						fog = {
+							fog_start = 0.5,
+							fog_distance = 50,
+							fog_color = "#ddccaa00"
+						}
+					})
+					v:set_lighting({exposure = {exposure_correction = 0.5}, saturation = 1.2})
+
+					ps[v:get_player_name()] = false
+				end
+			else
+				if ps[v:get_player_name()] == nil then ps[v:get_player_name()] = false end
+				if ps[v:get_player_name()] == false then
+					v:set_sky({
+						type = "plain",
+						base_color = "#000001",
+						fog = {
+							fog_start = 0.7,
+							fog_distance = 10,
+						}
+					})
+					v:set_lighting({exposure = {exposure_correction = 2}, saturation = 1.5})
+
+					ps[v:get_player_name()] = true
+				end
 			end
 		end
 	end
