@@ -19,8 +19,8 @@ mg_factory.manufactory.generator_formspec = function(pos)
     "image[0.3,2;9,1;mg_factory_guibar_bg.png]" ..
     "image[0.32,2;" .. 8.96*ratio .. ",1;mg_factory_guibar_fg.png]" ..
     "label[0.5,2.2;" .. ratio*100 .. "%]" ..
-    "list["..inv..";fuel;1,0;4,1;]"..
-    "list["..inv..";inp;4.25,0;2,1;]"..
+    "list["..inv..";fuel;0.5,0;4,1;]"..
+    "list["..inv..";inp;5.5,0;2,1;]"..
     "list[current_player;main;0,4.25;8,1;]"..
     "list[current_player;main;0,5.5;8,3;8]"
     return formspec
@@ -126,6 +126,8 @@ mg_factory.manufactory.register_machine = function(name, def, overrides)
         drawtype = "mesh",
         mesh = def.mesh,
         tiles = def.tiles,
+        use_texture_alpha=def.use_texture_alpha or "clip",
+        backface_culling=(not def.use_texture_alpha == "blend") or true,
         paramtype2 = "facedir",
         groups = {diggable=1, machine=def.machine.num},
         sounds=mg_core.node_sounds(),
@@ -479,12 +481,117 @@ mg_factory.manufactory.register_machine("furnace", {
     },
     on_inventory_put = function(pos, listname, index, stack, player)
         if listname == "src" then
-            core.get_node_timer(pos):start(3)
+            core.get_node_timer(pos):start(1)
         end
     end,
     on_inventory_move = function(pos, from_list, from_index, to_list, to_index, count)
         if to_list == "src" then
-            core.get_node_timer(pos):start(3)
+            core.get_node_timer(pos):start(1)
+        end
+    end,
+    on_timer = function(pos, elapsed, node, timeout)
+        --core.log("Timer at " .. core.pos_to_string(pos))
+        manufacture_item(pos, "refining")
+        local inv = core.get_meta(pos):get_inventory()
+        if inv:get_stack("src", 1):get_count() < 1 then
+            return false -- stop the timer if nothing is left in src
+        end
+        return true
+    end
+}, {})
+
+-- Nuclear Machines
+
+
+mg_factory.manufactory.register_machine("chamber", {
+    description = "Pressure Chamber",
+    mesh = "mg_chamber.obj",
+    tiles = {"mg_machine_nuclear_frame.png", "mg_machine_nuclear_metal.png"},
+    machine = {type="user", num = 1, active = false},
+    formspec = mg_factory.manufactory.press_formspec,
+    inventories = {
+        {name="src", size=1},
+        {name="dst", size=4}
+    },
+    on_inventory_put = function(pos, listname, index, stack, player) --pos, from_list, from_index, to_list, to_index, count
+        if listname == "src" then
+            core.get_node_timer(pos):start(1)
+        end
+    end,
+    on_inventory_move = function(pos, from_list, from_index, to_list, to_index, count)
+        if to_list == "src" then
+            core.get_node_timer(pos):start(1)
+        end
+    end,
+    on_timer = function(pos, elapsed, node, timeout)
+        --core.log("Timer at " .. core.pos_to_string(pos))
+        manufacture_item(pos, "pressing")
+        local inv = core.get_meta(pos):get_inventory()
+        if inv:get_stack("src", 1):get_count() < 1 then
+            return false
+        end
+        return true
+    end
+}, {})
+
+mg_factory.manufactory.register_machine("reactor", {
+    description = "Nuclear Reactor",
+    mesh = "mg_reactor.obj",
+    tiles = {"mg_machine_nuclear_frame.png", "mg_machine_nuclear_metal.png", "mg_machine_nuclear_glass.png"},
+    use_texture_alpha="blend",
+    machine = {type="generator", num = 2, active = false},
+    formspec = mg_factory.manufactory.generator_formspec,
+    inventories = {
+        {name="fuel", size=4},
+        {name="inp", size=2}
+    },
+    power = {max = 5000},
+    on_inventory_put = function(pos, listname, index, stack, player) --pos, from_list, from_index, to_list, to_index, count
+        if listname == "fuel" or listname == "inp" then
+            core.get_node_timer(pos):start(1)
+        end
+    end,
+    on_inventory_move = function(pos, from_list, from_index, to_list, to_index, count)
+        if to_list == "fuel" or to_list == "inp" then
+            core.get_node_timer(pos):start(1)
+        end
+    end,
+    on_timer = function(pos, elapsed, node, timeout)
+        local meta = core.get_meta(pos)
+        local inv = meta:get_inventory()
+        local fuel = ItemStack("mg_core:uranium 2")
+        local inp = ItemStack("mg_core:nickel")
+
+        if inv:contains_item("fuel", fuel) and inv:contains_item("inp", inp) and meta:get_int("power") <= meta:get_int("capacity") - 10 then
+            manufacture_particles(pos)
+            inv:remove_item("fuel", fuel)
+            inv:remove_item("inp", inp)
+            local meta = generate(pos, 100)
+            meta:set_string("formspec", mg_factory.manufactory.generator_formspec(pos))
+            return true
+        end
+        return false
+    end
+}, {})
+
+mg_factory.manufactory.register_machine("centrifuge", {
+    description = "Centrifuge",
+    mesh = "mg_centrifuge.obj",
+    tiles = {"mg_machine_nuclear_metal.png", "mg_machine_nuclear_frame.png"},
+    machine = {type="user", num = 1, active = false},
+    formspec = mg_factory.manufactory.refinery_formspec,
+    inventories = {
+        {name="src", size=1},
+        {name="dst", size=4}
+    },
+    on_inventory_put = function(pos, listname, index, stack, player)
+        if listname == "src" then
+            core.get_node_timer(pos):start(1)
+        end
+    end,
+    on_inventory_move = function(pos, from_list, from_index, to_list, to_index, count)
+        if to_list == "src" then
+            core.get_node_timer(pos):start(1)
         end
     end,
     on_timer = function(pos, elapsed, node, timeout)
