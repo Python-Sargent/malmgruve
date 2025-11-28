@@ -29,8 +29,9 @@ end
 mg_factory.manufactory.press_formspec = function(pos)
     local inv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
     local formspec = "size[8,8.5]"..
-    "list[" .. inv ..";src;2.75,0.5;1,1;]"..
-    "list[" .. inv ..";dst;2.75,2.5;4,4;]"..
+    "list[" .. inv ..";src;1.5,1.5;1,1;]"..
+    "image[3,1.5;1,1;mg_press.png]" ..
+    "list[" .. inv ..";dst;4.5,1;2,2;]"..
     "list[current_player;main;0,4.25;8,1;]"..
     "list[current_player;main;0,5.5;8,3;8]" ..
     "listring[" .. inv ..";dst]"..
@@ -43,8 +44,9 @@ end
 mg_factory.manufactory.refinery_formspec = function(pos)
     local inv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
     local formspec = "size[8,8.5]"..
-    "list[" .. inv ..";src;2.75,0.5;1,1;]"..
-    "list[" .. inv ..";dst;2.75,2.5;4,4;]"..
+    "list[" .. inv ..";src;1.5,1.5;1,1;]"..
+    "image[3,1.5;1,1;mg_refinery.png]" ..
+    "list[" .. inv ..";dst;4.5,1;2,2;]"..
     "list[current_player;main;0,4.25;8,1;]"..
     "list[current_player;main;0,5.5;8,3;8]" ..
     "listring[" .. inv ..";dst]"..
@@ -70,6 +72,7 @@ mg_factory.manufactory.manufacturer_formspec = function(pos)
     manufactures ..
     "field[0,0;0,0;pos;;"..core.pos_to_string(pos).."]" ..
     "list[" .. inv ..";src;1,2;2,2;]"..
+    "image[3.5,2.5;1,1;mg_factory.png]" ..
     "list[" .. inv ..";dst;5,2;2,2;]"..
     "list[current_player;main;0,4.25;8,1;]"..
     "list[current_player;main;0,5.5;8,3;8]" ..
@@ -521,7 +524,7 @@ core.register_on_player_receive_fields(function(player, formname, fields)
         local item = nil
         for k,v in pairs(fields) do
             --core.log(tostring(k) .. " <-> " .. tostring(v))
-            if k ~= "quit"then
+            if k ~= "quit" and k ~= "pos" then
                 item = k
             end
         end
