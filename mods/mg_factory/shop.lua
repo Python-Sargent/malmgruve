@@ -36,9 +36,22 @@ end
 
 produce["mg_mining:dynamite"] = {price=500}
 
-produce["mg_factory:roller"] = {price=115+100}
-produce["mg_factory:mill"] = {price=110+100}
-produce["mg_factory:crank"] = {price=120+100}
+-- Mechanical
+produce["mg_factory:roller"] = {price=215}
+produce["mg_factory:mill"] = {price=210}
+produce["mg_factory:crank"] = {price=220}
+
+--Hydrothermal
+produce["mg_factory:compressor"] = {price=515}
+produce["mg_factory:furnace"] = {price=510}
+produce["mg_factory:engine"] = {price=520}
+
+--[[
+produce["mg_factory:chamber"] = {price=115+100}
+produce["mg_factory:centrifuge"] = {price=110+100}
+produce["mg_factory:reactor"] = {price=120+100}
+]]
+
 produce["mg_factory:manufacturer"] = {price=127+103} -- base sale-equalized price + manufactured offset factor
 
 produce["mg_carts:cart"] = {price=171+104}

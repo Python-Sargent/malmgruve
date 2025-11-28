@@ -125,6 +125,7 @@ mg_factory.manufactory.register_machine = function(name, def, overrides)
         tiles = def.tiles,
         paramtype2 = "facedir",
         groups = {diggable=1, machine=def.machine.num},
+        sounds=mg_core.node_sounds(),
         on_construct = function(pos)
             local meta = core.get_meta(pos)
             --meta:set_string("formspec", def.formspec(pos))
@@ -452,7 +453,7 @@ mg_factory.manufactory.register_machine("engine", {
         local inv = meta:get_inventory()
         local fuel = ItemStack("mg_core:raw_coal")
 
-        if inv:contains_item("fuel", fuel) then
+        if inv:contains_item("fuel", fuel) and meta:get_int("power") <= meta:get_int("capacity") - 10 then
             manufacture_particles(pos)
             inv:remove_item("fuel", fuel)
             local meta = generate(pos, 10)

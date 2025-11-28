@@ -29,13 +29,7 @@ for _, v in pairs(mg_core.ores.registered_raw) do
     end
 end
 
-mg_factory.register_recipe("mg_factory:manufacturer", {
-    type = "specific",
-    amount = 1,
-    machine = "manufacturing",
-    requires = {"mg_core:aluminum 2", "mg_core:iron_sheet"},
-    result = "mg_factory:manufacturer"
-})
+-- Cart Items
 
 mg_factory.register_recipe("mg_carts:cart", {
     type = "specific",
@@ -51,6 +45,40 @@ mg_factory.register_recipe("mg_carts:rail_straight", {
     machine = "manufacturing",
     requires = {"mg_core:iron 2"},
     result = "mg_carts:rail_straight"
+})
+
+-- Manufactory Machines
+
+mg_factory.register_recipe("mg_factory:compressor", {
+    type = "specific",
+    amount = 1,
+    machine = "manufacturing",
+    requires = {"mg_core:lead 2", "mg_core:iron_sheet 2"},
+    result = "mg_factory:compressor"
+})
+
+mg_factory.register_recipe("mg_factory:engine", {
+    type = "specific",
+    amount = 1,
+    machine = "manufacturing",
+    requires = {"mg_core:copper_sheet 2", "mg_core:cinnabar"},
+    result = "mg_factory:engine"
+})
+
+mg_factory.register_recipe("mg_factory:furnace", {
+    type = "specific",
+    amount = 1,
+    machine = "manufacturing",
+    requires = {"mg_core:copper 2", "mg_core:bornite"},
+    result = "mg_factory:furnace"
+})
+
+mg_factory.register_recipe("mg_factory:manufacturer", {
+    type = "specific",
+    amount = 1,
+    machine = "manufacturing",
+    requires = {"mg_core:aluminum 2", "mg_core:iron_sheet"},
+    result = "mg_factory:manufacturer"
 })
 
 --[[
