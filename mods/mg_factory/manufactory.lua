@@ -7,10 +7,7 @@ mg_factory.manufactory.generator_formspec = function(pos)
     --if mg_factory.manufactory.machines[core.get_node(pos).name].is_active == true then
     --    switch = "mg_factory_deactivate.png"
     --end
-
-    --"list[context;src;2.75,0.5;1,1;]"..
-    --"list[context;dst;2.75,2.5;1,1;]"..
-
+    local inv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
     local meta = core.get_meta(pos)
     local power = meta:get_int("power")
     local capacity = meta:get_int("capacity") or 0
@@ -22,6 +19,8 @@ mg_factory.manufactory.generator_formspec = function(pos)
     "image[0.3,2;9,1;mg_factory_guibar_bg.png]" ..
     "image[0.32,2;" .. 8.96*ratio .. ",1;mg_factory_guibar_fg.png]" ..
     "label[0.5,2.2;" .. ratio*100 .. "%]" ..
+    "list["..inv..";fuel;1,0;4,1;]"..
+    "list["..inv..";inp;4.25,0;2,1;]"..
     "list[current_player;main;0,4.25;8,1;]"..
     "list[current_player;main;0,5.5;8,3;8]"
     return formspec
@@ -41,7 +40,7 @@ mg_factory.manufactory.press_formspec = function(pos)
     return formspec
 end
 
-mg_factory.manufactory.smelter_formspec = function(pos)
+mg_factory.manufactory.refinery_formspec = function(pos)
     local inv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
     local formspec = "size[8,8.5]"..
     "list[" .. inv ..";src;2.75,0.5;1,1;]"..
@@ -85,9 +84,11 @@ mg_factory.manufactory.register_machine = function(name, def, overrides)
     local function can_dig(pos, player)
         local inv = core.get_meta(pos):get_inventory()
         local is_empty = true
-        for _, i in pairs(def.inventories) do
-            if not inv:is_empty(i.name) then
-                is_empty = false
+        if def.inventories ~= nil then
+            for _, i in pairs(def.inventories) do
+                if not inv:is_empty(i.name) then
+                    is_empty = false
+                end
             end
         end
         return is_empty
@@ -135,8 +136,10 @@ mg_factory.manufactory.register_machine = function(name, def, overrides)
             meta:set_int("power", power.default or 0)
             meta:set_int("capacity", power.max or 0)
             local inv = meta:get_inventory()
-            for _, i in pairs(def.inventories) do
-                inv:set_size(i.name, i.size)
+            if def.inventories ~= nil then
+                for _, i in pairs(def.inventories) do
+                    inv:set_size(i.name, i.size)
+                end
             end
         end,
         on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
@@ -211,6 +214,27 @@ mg_factory.manufactory.register_machine("manufactory_on", {
 }, {groups={diggable=1, machine=3, not_in_creative_inventory=1}})
 ]]
 
+local manufacture_particles = function(pos)
+    local texture = core.registered_nodes[core.get_node(pos).name].tiles[1]
+    core.add_particlespawner({
+        amount = 300,
+        time = 1,
+        collisiondetection = true,
+        --object_collision = true,
+
+        pos = {
+            min = vector.new(pos.x-0.6,pos.y-0.6,pos.z-0.6),
+            max = vector.new(pos.x+0.6,pos.y+0.6,pos.z+0.6),
+            bias = 0
+        },
+        acc = vector.new(0, -1, -10),
+        size = { min = 0.5, max = 1 },
+        exptime = { min = 0.5, max = 1 },
+        glow = 10,
+        texture = texture
+    })
+end
+
 local manufacture_item = function(pos, type)
     local meta = core.get_meta(pos)
     local inv = meta:get_inventory()
@@ -239,6 +263,7 @@ local manufacture_item = function(pos, type)
     if product.left ~= nil then
         inv:add_item("src", ItemStack(product.left, product.amount))
     end
+    manufacture_particles(pos)
 end
 
 local get_items = function(items, inv)
@@ -280,9 +305,12 @@ local m_manufacture = function(pos, input)
     local success = get_items(product.requires, inv)
     if success then
         inv:add_item("dst", ItemStack(product.result, product.amount))
+        manufacture_particles(pos)
     end
     return success
 end
+
+-- Mechanical Machines
 
 mg_factory.manufactory.register_machine("roller", {
     description = "Roller Press",
@@ -324,10 +352,6 @@ mg_factory.manufactory.register_machine("crank", {
     tiles = {"mg_machine_mechanical_frame.png", "mg_machine_mechanical_wood.png", "mg_machine_mechanical_metal.png"},
     machine = {type="generator", num = 2, active = false},
     formspec = mg_factory.manufactory.generator_formspec,
-    inventories = {
-        {name="src", size=1},
-        {name="dst", size=4}
-    },
     power = {max = 100}
 }, {
     on_punch = function(pos, node, puncher, pointed_thing)
@@ -341,7 +365,7 @@ mg_factory.manufactory.register_machine("mill", {
     mesh = "mg_ball_mill.obj",
     tiles = {"mg_machine_mechanical_frame.png", "mg_machine_mechanical_metal.png", "mg_machine_mechanical_wood.png"},
     machine = {type="user", num = 1, active = false},
-    formspec = mg_factory.manufactory.press_formspec,
+    formspec = mg_factory.manufactory.refinery_formspec,
     inventories = {
         {name="src", size=1},
         {name="dst", size=4}
@@ -369,6 +393,108 @@ mg_factory.manufactory.register_machine("mill", {
         return true
     end
 }, {})
+
+-- Hydrothermal Machines
+
+mg_factory.manufactory.register_machine("compressor", {
+    description = "Steam Press",
+    mesh = "mg_steam_press.obj",
+    tiles = {"mg_machine_hydrothermal_metal.png", "mg_machine_hydrothermal_frame.png"},
+    machine = {type="user", num = 1, active = false},
+    formspec = mg_factory.manufactory.press_formspec,
+    inventories = {
+        {name="src", size=1},
+        {name="dst", size=4}
+    },
+    on_inventory_put = function(pos, listname, index, stack, player) --pos, from_list, from_index, to_list, to_index, count
+        if listname == "src" then
+            core.get_node_timer(pos):start(3)
+        end
+    end,
+    on_inventory_move = function(pos, from_list, from_index, to_list, to_index, count)
+        if to_list == "src" then
+            core.get_node_timer(pos):start(3)
+        end
+    end,
+    on_timer = function(pos, elapsed, node, timeout)
+        --core.log("Timer at " .. core.pos_to_string(pos))
+        manufacture_item(pos, "pressing")
+        local inv = core.get_meta(pos):get_inventory()
+        if inv:get_stack("src", 1):get_count() < 1 then
+            return false
+        end
+        return true
+    end
+}, {})
+
+mg_factory.manufactory.register_machine("engine", {
+    description = "Steam Engine",
+    mesh = "mg_steam_engine.obj",
+    tiles = {"mg_machine_hydrothermal_metal.png", "mg_machine_hydrothermal_frame.png", "mg_machine_hydrothermal_coals.png"},
+    machine = {type="generator", num = 2, active = false},
+    formspec = mg_factory.manufactory.generator_formspec,
+    inventories = {
+        {name="fuel", size=4}
+    },
+    power = {max = 500},
+    on_inventory_put = function(pos, listname, index, stack, player) --pos, from_list, from_index, to_list, to_index, count
+        if listname == "fuel" then
+            core.get_node_timer(pos):start(3)
+        end
+    end,
+    on_inventory_move = function(pos, from_list, from_index, to_list, to_index, count)
+        if to_list == "fuel" then
+            core.get_node_timer(pos):start(3)
+        end
+    end,
+    on_timer = function(pos, elapsed, node, timeout)
+        local meta = core.get_meta(pos)
+        local inv = meta:get_inventory()
+        local fuel = ItemStack("mg_core:raw_coal")
+
+        if inv:contains_item("fuel", fuel) then
+            manufacture_particles(pos)
+            inv:remove_item("fuel", fuel)
+            local meta = generate(pos, 10)
+            meta:set_string("formspec", mg_factory.manufactory.generator_formspec(pos))
+            return true
+        end
+        return false
+    end
+}, {})
+
+mg_factory.manufactory.register_machine("furnace", {
+    description = "Blast Furnace",
+    mesh = "mg_blast_furnace.obj",
+    tiles = {"mg_machine_hydrothermal_frame.png", "mg_machine_hydrothermal_metal.png", "mg_machine_hydrothermal_coals.png"},
+    machine = {type="user", num = 1, active = false},
+    formspec = mg_factory.manufactory.refinery_formspec,
+    inventories = {
+        {name="src", size=1},
+        {name="dst", size=4}
+    },
+    on_inventory_put = function(pos, listname, index, stack, player)
+        if listname == "src" then
+            core.get_node_timer(pos):start(3)
+        end
+    end,
+    on_inventory_move = function(pos, from_list, from_index, to_list, to_index, count)
+        if to_list == "src" then
+            core.get_node_timer(pos):start(3)
+        end
+    end,
+    on_timer = function(pos, elapsed, node, timeout)
+        --core.log("Timer at " .. core.pos_to_string(pos))
+        manufacture_item(pos, "refining")
+        local inv = core.get_meta(pos):get_inventory()
+        if inv:get_stack("src", 1):get_count() < 1 then
+            return false -- stop the timer if nothing is left in src
+        end
+        return true
+    end
+}, {})
+
+-- Generic Machines
 
 mg_factory.manufactory.register_machine("manufacturer", {
     description = "Manufacturer",

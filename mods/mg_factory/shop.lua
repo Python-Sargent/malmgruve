@@ -81,19 +81,19 @@ local shop_formspec = function(player, context, selling)
             if selling == true then
                 price = math.round(v.price * rate)
             end
-            products = products .. "image[0,"..(p-0.25)..";5.75,1.5;mg_bg.png;]" ..
+            products = products .. --"image[0,"..(p-0.25)..";5.75,1.5;mg_bg.png;]" ..
             "item_image_button[0.2,"..p..";1,1;"..key..";"..key..";]" ..
-            "hypertext[1.5,"..(p+0.25)..";5,1;cost;<style color='gold' size='24' font='mono'><style color='yellow'>"..cost_desc.."</style><b>"..price.." Kolro</b></style>]"
+            "hypertext[1.5,"..(p+0.25)..";3.5,1;cost;<style color='gold' size='24' font='mono'><style color='yellow'>"..cost_desc.."</style><b>"..price.." Kolro</b></style>]"
             p = p+1.25
         end
     end
     
     return sfinv.make_formspec(player, context, "image[6.5,0;0.5,0.5;mg_kolro.png;]" ..
-    "hypertext[7.25,0.1;5,1;kolro;<style color='gold' size='16'><b>"..money.." Klo</b></style>]" ..
+    "hypertext[7.25,0.1;5,1;kolro;<style color='gold' size='16'><b>"..money.." K</b></style>]" ..
     "field[5,4.25;3.5,1;filter;Search;"..meta:get_string("shop_filter").."]" ..
     "field_close_on_enter[filter;false]" ..
-    "scroll_container[0,0;8.5,6;scroll;vertical;0.2]" ..
-    "scrollbar[8,0;1,"..p..";vertical;scroll;"..meta:get_int("shop_scroll").."]" ..
+    "scroll_container[0,0;6.2,6;scroll;vertical;0.2]" ..
+    "scrollbar[-5,0;0,"..p..";vertical;scroll;"..meta:get_int("shop_scroll").."]" .. -- just hide it, we don't ned it to show
     products ..
     "scroll_container_end[]" ..
     "list[current_player;main;0,5;8,1;]"..
@@ -104,7 +104,8 @@ local handle_fields = function(player, fields, item_action)
     local meta = player:get_meta()
     local item = nil
     for k,v in pairs(fields) do
-        if k ~= "quit" and k ~= "scroll" then
+        --core.log(k .. " :: " .. v)
+        if k ~= "quit" and k ~= "scroll" and k ~= "filter" and k ~= "key_enter" and k ~= "key_enter_field" then
             item = k
         end
     end
