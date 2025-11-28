@@ -1,5 +1,7 @@
 [![ContentDB](https://content.luanti.org/packages/SuperStarSonic/malmgruve/shields/downloads/)](https://content.luanti.org/packages/SuperStarSonic/malmgruve/)
 
+<img width="1920" height="1080" alt="manufactory_machines.png" src="https://github.com/user-attachments/assets/468ac9e9-2b0b-4124-9297-f453f644d134" />
+
 # Malmgruve
 
 Malmgruve is a progression mining game made for the 2025 Luanti Game Jam. It focuses on realistic (and mostly accurate) geology. You can build machines, sell ores and create infrastructure.
