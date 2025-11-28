@@ -93,7 +93,9 @@ core.register_on_mods_loaded(function()
                 "Rails will automatically place, but the algorithm is very basic",
                 "To place a straight, place it in the same direction on the end of a straight.",
                 "To place a slope, place the rail above or below another rail",
-                "The rail will curve if placed perpendicular to a rail at it's end."
+                "The rail will curve if placed perpendicular to a rail at it's end.",
+                "",
+                "<style size='18'><b>INVENTORY</b></style>",
             }
 
             local content = ""

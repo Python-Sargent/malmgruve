@@ -9,16 +9,8 @@ local initial_items = {
 
 local welcome_formspec = function(player)
 	local content = "<center><style color='#aaccff' size='18'><b>Hello " .. player:get_player_name() .. ", welcome to Malmgruve.</b></style></center>" ..
-	"Malmgruve is a progression mining game, made for the 2025 Luanti Game Jam\n\n" ..
-	"<big>How to play:</big><style color='#aaddff' font='mono'>" ..
-	"\n* Recipes can be found in your inventory" ..
-	"\n* Machines must be powered by a generator which stores power units" ..
-	"\n<item name='mg_factory:crank' width='64' height='64'> ... <style size='24' color='gray'>Mechanical Crank: 100 Power Units</style>" ..
-	"\n* Carts can be filled/emptied by rightlicking with ore or an empty hand respectively" ..
-	"\n* Carts can be pushed by punching them, or stopped if they are already moving" ..
-	"\n* Bags can be equipped to give you more inventory space (see the slot in the top-right of your inventory)" ..
-	"\n* The currency in Malmgruve (Kolro) can be used to by utilites such as explosives and bags" ..
-	"\n* You can sell Ores, Machines, and refined Materials for Kolro" ..
+	"Malmgruve is a progression mining game, made for the 2025 Luanti Game Jam\n" ..
+	"Check out the Guide in your inventory to learn how to play.\n" ..
 	"</style>\n\n<img name='malmgruve.png'> <style color='#aaccff' size='11'>by SuperStarSonic</style>\n\n"
 	local i = 4
 	--content = content .. "<normal> </normal>"

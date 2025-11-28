@@ -537,7 +537,7 @@ mg_factory.manufactory.register_machine("chamber", {
 mg_factory.manufactory.register_machine("reactor", {
     description = "Nuclear Reactor",
     mesh = "mg_reactor.obj",
-    tiles = {"mg_machine_nuclear_frame.png", "mg_machine_nuclear_metal.png", "mg_machine_nuclear_glass.png"},
+    tiles = {"mg_machine_nuclear_frame.png", "mg_machine_nuclear_metal.png", {name="mg_machine_nuclear_glass.png", backface_culling=false,}},
     use_texture_alpha="blend",
     machine = {type="generator", num = 2, active = false},
     formspec = mg_factory.manufactory.generator_formspec,
