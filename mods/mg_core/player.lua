@@ -132,7 +132,7 @@ core.register_globalstep(function(dtime)
 						base_color = "#000001",
 						fog = {
 							fog_start = 0.7,
-							fog_distance = 10,
+							fog_distance = 20,
 						}
 					})
 					v:set_lighting({exposure = {exposure_correction = 2}, saturation = 1.5})

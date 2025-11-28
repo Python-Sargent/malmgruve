@@ -73,6 +73,31 @@ mg_factory.register_recipe("mg_factory:furnace", {
     result = "mg_factory:furnace"
 })
 
+
+mg_factory.register_recipe("mg_factory:chamber", {
+    type = "specific",
+    amount = 1,
+    machine = "manufacturing",
+    requires = {"mg_core:chromium", "mg_core:tungsten_sheet 2"},
+    result = "mg_factory:chamber"
+})
+
+mg_factory.register_recipe("mg_factory:reactor", {
+    type = "specific",
+    amount = 1,
+    machine = "manufacturing",
+    requires = {"mg_core:tungsten 2", "mg_core:cobalt_sheet2"},
+    result = "mg_factory:reactor"
+})
+
+mg_factory.register_recipe("mg_factory:centrifuge", {
+    type = "specific",
+    amount = 1,
+    machine = "manufacturing",
+    requires = {"mg_core:cobalt_sheet 2", "mg_core:platinum"},
+    result = "mg_factory:centrifuge"
+})
+
 mg_factory.register_recipe("mg_factory:manufacturer", {
     type = "specific",
     amount = 1,
