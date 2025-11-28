@@ -127,14 +127,14 @@ core.register_globalstep(function(dtime)
 			else
 				if ps[v:get_player_name()] == nil then ps[v:get_player_name()] = false end
 				if ps[v:get_player_name()] == false then
-					v:set_sky({
+					--[[v:set_sky({
 						type = "plain",
 						base_color = "#000001",
 						fog = {
 							fog_start = 0.7,
 							fog_distance = 20,
 						}
-					})
+					})]]
 					v:set_lighting({exposure = {exposure_correction = 2}, saturation = 1.5})
 
 					ps[v:get_player_name()] = true

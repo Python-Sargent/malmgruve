@@ -165,6 +165,17 @@ core.register_on_generated(function(vm, minp, maxp, seed)
     }, {x=80, y=80, z=80})
     local ore_noise_m = ore_map:get_3d_map(m_pos)
 
+    local cave_map = core.get_value_noise_map({
+        offset = 0,
+        scale = 0.5,
+        spread = {x=20, y=10, z=20},
+        seed = 1,
+        octaves = 3,
+        persist = 0.63,
+        lacunarity = 2.0,
+    }, {x=80, y=80, z=80})
+    local cave_noise_m = cave_map:get_3d_map(m_pos)
+
     local ly = 0
     for y = minp.y, maxp.y do
         ly = ly + 1
@@ -196,6 +207,11 @@ core.register_on_generated(function(vm, minp, maxp, seed)
                     if ore_noise ~= nil and ore_noise > 0.6 and ore ~= air then
                         rock = ore
                     end
+                end
+
+                local cn = cave_noise_m[lx][ly][lz]
+                if rock ~= sand and rock ~= soil and cn*cn > 0.15 and y + rand*2 < -20 then -- and cn*cn < 0.5
+                    rock = air
                 end
 
                 data[vi] = rock
