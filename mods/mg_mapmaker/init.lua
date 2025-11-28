@@ -2,14 +2,14 @@
 
 mapmaker = {}
 
-local function update_sfinv(name)
+local function update_mg_sfinv(name)
 	core.after(0, function()
 		local player = core.get_player_by_name(name)
 		if player then
-			if sfinv.get_page(player):sub(1, 9) == "mapmaker:" then
-				sfinv.set_page(player, sfinv.get_homepage_name(player))
+			if mg_sfinv.get_page(player):sub(1, 9) == "mapmaker:" then
+				mg_sfinv.set_page(player, mg_sfinv.get_homepage_name(player))
 			else
-				sfinv.set_player_inventory_formspec(player)
+				mg_sfinv.set_player_inventory_formspec(player)
 			end
 		end
 	end)
@@ -19,8 +19,8 @@ core.register_privilege("mapmaker", {
 	description = "Allow player to use the mapmaker",
 	give_to_singleplayer = false,
 	give_to_admin = false,
-	on_grant = update_sfinv,
-	on_revoke = update_sfinv,
+	on_grant = update_mg_sfinv,
+	on_revoke = update_mg_sfinv,
 })
 
 -- Override the engine's mapmaker mode function

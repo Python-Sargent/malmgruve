@@ -1,4 +1,4 @@
-Minetest Game mod: sfinv
+Minetest Game mod: mg_sfinv
 ========================
 See license.txt for license information.
 
@@ -15,4 +15,4 @@ rubenwardy (MIT)
 Authors of media
 ----------------
 paramat (CC BY-SA 3.0):
-  sfinv_crafting_arrow.png - derived from a texture by BlockMen (CC BY-SA 3.0)
+  mg_sfinv_crafting_arrow.png - derived from a texture by BlockMen (CC BY-SA 3.0)

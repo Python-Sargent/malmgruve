@@ -142,7 +142,7 @@ trash:set_size("main", 1)
 mapmaker.formspec_add = ""
 
 function mapmaker.register_tab(name, title, items)
-	sfinv.register_page("mapmaker:" .. name, {
+	mg_sfinv.register_page("mapmaker:" .. name, {
 		title = title,
 		is_in_nav = function(self, player, context)
 			return core.is_creative_enabled(player:get_player_name())
@@ -154,7 +154,7 @@ function mapmaker.register_tab(name, title, items)
 			local pagenum = math.floor(inv.start_i / (4*8) + 1)
 			local pagemax = math.max(math.ceil(inv.size / (4*8)), 1)
 			local esc = core.formspec_escape
-			return sfinv.make_formspec(player, context,
+			return mg_sfinv.make_formspec(player, context,
 				(inv.size == 0 and ("label[3,2;"..esc("No items to show.").."]") or "") ..
 				"label[5.8,4.15;" .. core.colorize("#FFFF00", tostring(pagenum)) .. " / " .. tostring(pagemax) .. "]" ..
 				[[
@@ -195,7 +195,7 @@ function mapmaker.register_tab(name, title, items)
 			if fields.mapmaker_clear then
 				inv.start_i = 0
 				inv.filter = ""
-				sfinv.set_player_inventory_formspec(player, context)
+				mg_sfinv.set_player_inventory_formspec(player, context)
 			elseif (fields.mapmaker_search or
 					fields.key_enter_field == "mapmaker_filter")
 					and fields.mapmaker_filter then
@@ -203,7 +203,7 @@ function mapmaker.register_tab(name, title, items)
 				inv.filter = fields.mapmaker_filter:sub(1, 128) -- truncate to a sane length
 						:gsub("[%z\1-\8\11-\31\127]", "") -- strip naughty control characters (keeps \t and \n)
 						:lower() -- search is case insensitive
-				sfinv.set_player_inventory_formspec(player, context)
+				mg_sfinv.set_player_inventory_formspec(player, context)
 			elseif not fields.quit then
 				local start_i = inv.start_i or 0
 
@@ -223,7 +223,7 @@ function mapmaker.register_tab(name, title, items)
 				end
 
 				inv.start_i = start_i
-				sfinv.set_player_inventory_formspec(player, context)
+				mg_sfinv.set_player_inventory_formspec(player, context)
 			end
 		end
 	})
@@ -254,8 +254,8 @@ mapmaker.register_tab("nodes", "Nodes", registered_nodes)
 mapmaker.register_tab("tools", "Tools", registered_tools)
 mapmaker.register_tab("craftitems", "Items", registered_craftitems)
 
-local old_homepage_name = sfinv.get_homepage_name
-function sfinv.get_homepage_name(player)
+local old_homepage_name = mg_sfinv.get_homepage_name
+function mg_sfinv.get_homepage_name(player)
 	if core.is_creative_enabled(player:get_player_name()) then
 		return "mapmaker:all"
 	else

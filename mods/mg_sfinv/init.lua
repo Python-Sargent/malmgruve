@@ -1,9 +1,9 @@
--- sfinv/init.lua
+-- mg_sfinv/init.lua
 
-dofile(minetest.get_modpath("sfinv") .. "/api.lua")
+dofile(minetest.get_modpath("mg_sfinv") .. "/api.lua")
 
 -- Load support for MT game translation.
---local S = minetest.get_translator("sfinv")
+--local S = minetest.get_translator("mg_sfinv")
 
 core.register_on_newplayer(function(player)
 	local inv = player:get_inventory()
@@ -22,10 +22,10 @@ core.register_on_joinplayer(function(player, last_login)
 	end
 end)
 
-sfinv.register_page("sfinv:bag", {
+mg_sfinv.register_page("mg_sfinv:bag", {
 	title = "Bag",
 	get = function(self, player, context)
-		return sfinv.make_formspec(player, context, "" ..
+		return mg_sfinv.make_formspec(player, context, "" ..
 			"model[2.6878,0;3,6;player_preview;character.obj;character.png;0;false;true;]" ..
 			"image[0,5.2;1,1;gui_hb_bg.png]" ..
 			"image[1,5.2;1,1;gui_hb_bg.png]" ..
@@ -67,7 +67,7 @@ sfinv.register_page("sfinv:bag", {
 --[[
 list[current_player;craft;1.75,0.5;3,3;]
 list[current_player;craftpreview;5.75,1.5;1,1;]
-image[4.75,1.5;1,1;sfinv_crafting_arrow.png]
+image[4.75,1.5;1,1;mg_sfinv_crafting_arrow.png]
 listring[current_player;craft]
 listring[current_player;main]
 ]]--

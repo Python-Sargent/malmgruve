@@ -5,7 +5,7 @@ local sm = {
 }
 
 core.register_on_mods_loaded(function()
-    sfinv.register_page("recipes", {
+    mg_sfinv.register_page("recipes", {
         title = "Recipes",
         is_in_nav = function(self, player, context)
             return not core.is_creative_enabled(player:get_player_name())
@@ -48,7 +48,7 @@ core.register_on_mods_loaded(function()
                 end
             end
     
-            return sfinv.make_formspec(player, context, "scroll_container[0,-2;10.25,"..n..";scroll;vertical;]" ..
+            return mg_sfinv.make_formspec(player, context, "scroll_container[0,-2;10.25,"..n..";scroll;vertical;]" ..
             recipes ..
             "scrollbar[10.25,-2;0.25,"..n..";vertical;scroll;]" ..
             "scroll_container_end[]", false)

@@ -101,7 +101,7 @@ local shop_formspec = function(player, context, selling)
         end
     end
     
-    return sfinv.make_formspec(player, context, "image[6.5,0;0.5,0.5;mg_kolro.png;]" ..
+    return mg_sfinv.make_formspec(player, context, "image[6.5,0;0.5,0.5;mg_kolro.png;]" ..
     "hypertext[7.25,0.1;5,1;kolro;<style color='gold' size='16'><b>"..money.." K</b></style>]" ..
     "field[5,4.25;3.5,1;filter;Search;"..meta:get_string("shop_filter").."]" ..
     "field_close_on_enter[filter;false]" ..
@@ -142,7 +142,7 @@ local handle_fields = function(player, fields, item_action)
 end
 
 core.register_on_mods_loaded(function()
-    sfinv.register_page("store", {
+    mg_sfinv.register_page("store", {
         title = "Store",
         is_in_nav = function(self, player, context)
             return not core.is_creative_enabled(player:get_player_name())
@@ -151,7 +151,7 @@ core.register_on_mods_loaded(function()
             return shop_formspec(player, context, false)
         end,
         on_enter = function(self, player, context)
-            sfinv.set_player_inventory_formspec(player, context)
+            mg_sfinv.set_player_inventory_formspec(player, context)
         end,
         on_player_receive_fields = function(self, player, context, fields)
             handle_fields(player, fields, function(meta, prod, item)
@@ -161,11 +161,11 @@ core.register_on_mods_loaded(function()
                     player:get_inventory():add_item("main", ItemStack(item))
                 end
             end)
-            sfinv.set_player_inventory_formspec(player, context)
+            mg_sfinv.set_player_inventory_formspec(player, context)
         end
     })
 
-    sfinv.register_page("exchange", {
+    mg_sfinv.register_page("exchange", {
         title = "Exchange",
         is_in_nav = function(self, player, context)
             return not core.is_creative_enabled(player:get_player_name())
@@ -174,7 +174,7 @@ core.register_on_mods_loaded(function()
             return shop_formspec(player, context, true)
         end,
         on_enter = function(self, player, context)
-            sfinv.set_player_inventory_formspec(player, context)
+            mg_sfinv.set_player_inventory_formspec(player, context)
         end,
         on_player_receive_fields = function(self, player, context, fields)
             handle_fields(player, fields, function(meta, prod, item)
@@ -184,7 +184,7 @@ core.register_on_mods_loaded(function()
                     player:get_inventory():remove_item("main", ItemStack(item))
                 end
             end)
-            sfinv.set_player_inventory_formspec(player, context)
+            mg_sfinv.set_player_inventory_formspec(player, context)
         end
     })
 end)

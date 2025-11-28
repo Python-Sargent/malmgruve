@@ -1,4 +1,4 @@
-Minetest Game mod: player_api
+Minetest Game mod: mg_player_api
 =============================
 See license.txt for license information.
 

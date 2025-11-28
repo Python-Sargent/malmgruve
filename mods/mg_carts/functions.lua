@@ -15,15 +15,15 @@ function carts:manage_attachment(player, obj)
 	if obj and player:get_attach() == obj then
 		return
 	end
-	player_api.player_attached[player_name] = status
+	mg_player_api.player_attached[player_name] = status
 
 	if status then
 		player:set_attach(obj, "", {x=0, y=-4.5, z=0}, {x=0, y=0, z=0})
 		player:set_eye_offset({x=0, y=-4, z=0},{x=0, y=-4, z=0})
 
-		-- player_api does not update the animation
+		-- mg_player_api does not update the animation
 		-- when the player is attached, reset to default animation
-		player_api.set_animation(player, "stand")
+		mg_player_api.set_animation(player, "stand")
 	else
 		player:set_detach()
 		player:set_eye_offset({x=0, y=0, z=0},{x=0, y=0, z=0})

@@ -1,13 +1,13 @@
-player_api = {}
+mg_player_api = {}
 
 -- Player animation blending
 -- Note: This is currently broken due to a bug in Irrlicht, leave at 0
 local animation_blend = 0
 
-player_api.registered_models = {}
+mg_player_api.registered_models = {}
 
 -- Local for speed.
-local models = player_api.registered_models
+local models = mg_player_api.registered_models
 
 local function collisionbox_equals(collisionbox, other_collisionbox)
 	if collisionbox == other_collisionbox then
@@ -21,7 +21,7 @@ local function collisionbox_equals(collisionbox, other_collisionbox)
 	return true
 end
 
-function player_api.register_model(name, def)
+function mg_player_api.register_model(name, def)
 	models[name] = def
 	def.visual_size = def.visual_size or {x = 1, y = 1}
 	def.collisionbox = def.collisionbox or {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3}
@@ -51,18 +51,18 @@ end
 -- Player stats and animations
 -- model, textures, animation
 local players = {}
-player_api.player_attached = {}
+mg_player_api.player_attached = {}
 
 local function get_player_data(player)
 	return assert(players[player:get_player_name()])
 end
 
-function player_api.get_animation(player)
+function mg_player_api.get_animation(player)
 	return get_player_data(player)
 end
 
 -- Called when a player's appearance needs to be updated
-function player_api.set_model(player, model_name)
+function mg_player_api.set_model(player, model_name)
 	local player_data = get_player_data(player)
 	if player_data.model == model_name then
 		return
@@ -83,7 +83,7 @@ function player_api.set_model(player, model_name)
 			stepheight = model.stepheight
 		})
 		-- sets local_animation, collisionbox & eye_height
-		player_api.set_animation(player, "stand")
+		mg_player_api.set_animation(player, "stand")
 	else
 		player:set_properties({
 			textures = {"player.png", "player_back.png"},
@@ -96,13 +96,13 @@ function player_api.set_model(player, model_name)
 	end
 end
 
-function player_api.get_textures(player)
+function mg_player_api.get_textures(player)
 	local player_data = get_player_data(player)
 	local model = models[player_data.model]
 	return assert(player_data.textures or (model and model.textures))
 end
 
-function player_api.set_textures(player, textures)
+function mg_player_api.set_textures(player, textures)
 	local player_data = get_player_data(player)
 	local model = models[player_data.model]
 	local new_textures = assert(textures or (model and model.textures))
@@ -110,13 +110,13 @@ function player_api.set_textures(player, textures)
 	player:set_properties({textures = new_textures})
 end
 
-function player_api.set_texture(player, index, texture)
-	local textures = table.copy(player_api.get_textures(player))
+function mg_player_api.set_texture(player, index, texture)
+	local textures = table.copy(mg_player_api.get_textures(player))
 	textures[index] = texture
-	player_api.set_textures(player, textures)
+	mg_player_api.set_textures(player, textures)
 end
 
-function player_api.set_animation(player, anim_name, speed, loop)
+function mg_player_api.set_animation(player, anim_name, speed, loop)
 	local player_data = get_player_data(player)
 	local model = models[player_data.model]
 	if not (model and model.animations[anim_name]) then
@@ -166,18 +166,18 @@ end
 core.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	players[name] = {}
-	player_api.player_attached[name] = false
+	mg_player_api.player_attached[name] = false
 end)
 
 core.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
 	players[name] = nil
-	player_api.player_attached[name] = nil
+	mg_player_api.player_attached[name] = nil
 end)
 
 -- Localize for better performance.
-local player_set_animation = player_api.set_animation
-local player_attached = player_api.player_attached
+local player_set_animation = mg_player_api.set_animation
+local player_attached = mg_player_api.player_attached
 
 -- Prevent knockback for attached players
 local old_calculate_knockback = core.calculate_knockback
@@ -189,7 +189,7 @@ function core.calculate_knockback(player, ...)
 end
 
 -- Check each player and apply animations
-function player_api.globalstep()
+function mg_player_api.globalstep()
 	for _, player in ipairs(core.get_connected_players()) do
 		local name = player:get_player_name()
 		local player_data = players[name]
@@ -221,14 +221,14 @@ function player_api.globalstep()
 	end
 end
 
--- Mods can modify the globalstep by overriding player_api.globalstep
+-- Mods can modify the globalstep by overriding mg_player_api.globalstep
 core.register_globalstep(function(...)
-	player_api.globalstep(...)
+	mg_player_api.globalstep(...)
 end)
 
 for _, api_function in pairs({"get_animation", "set_animation", "set_model", "set_textures"}) do
-	local original_function = player_api[api_function]
-	player_api[api_function] = function(player, ...)
+	local original_function = mg_player_api[api_function]
+	mg_player_api[api_function] = function(player, ...)
 		if not players[player:get_player_name()] then
 			-- HACK for keeping backwards compatibility
 			core.log("warning", api_function .. " called on offline player")
