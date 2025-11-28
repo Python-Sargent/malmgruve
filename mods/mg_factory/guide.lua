@@ -96,6 +96,8 @@ core.register_on_mods_loaded(function()
                 "The rail will curve if placed perpendicular to a rail at it's end.",
                 "",
                 "<style size='18'><b>INVENTORY</b></style>",
+                "Bags will expand the inventory to the default size when equipped in the bag slot.",
+                "Bags can be bought from the Store."
             }
 
             local content = ""
