@@ -6,7 +6,7 @@ minetest.register_tool("mg_core:trusty_pick", {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
 		groupcaps={
-			layer = {times={[3]=4.00, [2]=2.00, [1]=0.50}, uses=0},
+			layer = {times={[4]=8.00, [3]=4.00, [2]=2.00, [1]=0.50}, uses=0},
 		},
 		damage_groups = {fleshy=4},
 	},
