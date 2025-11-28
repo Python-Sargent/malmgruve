@@ -22,7 +22,11 @@ mg_factory.manufactory.generator_formspec = function(pos)
     "list["..inv..";fuel;0.5,0;4,1;]"..
     "list["..inv..";inp;5.5,0;2,1;]"..
     "list[current_player;main;0,4.25;8,1;]"..
-    "list[current_player;main;0,5.5;8,3;8]"
+    "list[current_player;main;0,5.5;8,3;8]" ..
+    "listring[" .. inv ..";inp]"..
+    "listring[current_player;main]" ..
+    "listring[" .. inv ..";fuel]"..
+    "listring[current_player;main]"
     return formspec
 end
 
