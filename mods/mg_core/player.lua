@@ -48,7 +48,7 @@ local find_suitable_spawn = function(player)
     local positions = core.find_nodes_in_area_under_air(vector.add(pos, -offset), vector.add(pos, offset), {"mg_core:sand"})
     local spawnpos = pos
     for _,v in pairs(positions) do
-        core.log(core.pos_to_string(v))
+        --core.log(core.pos_to_string(v))
         spawnpos = vector.offset(v, 0, 2, 0)
     end
     player:set_pos(spawnpos)
