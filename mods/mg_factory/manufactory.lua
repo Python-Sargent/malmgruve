@@ -648,8 +648,8 @@ local miner_positions = {}
 local miner_size = {x=16, y=128, z=16}
 
 for y=-1,-miner_size.y,-1 do
-    for x=-math.round(miner_size.x/2),miner_size.x,1 do
-        for z=-math.round(miner_size.z/2),miner_size.z,1 do
+    for x=-math.round(miner_size.x/2),math.round(miner_size.x/2),1 do
+        for z=-math.round(miner_size.z/2),math.round(miner_size.z/2),1 do
             table.insert(miner_positions, vector.new(x, y, z))
         end
     end
@@ -740,8 +740,8 @@ core.register_on_player_receive_fields(function(player, formname, fields)
             pos = core.string_to_pos(fields.pos)
         end
         if fields.activate and pos ~= nil then
-            core.log("Starting timer for miner")
-            core.get_node_timer(pos):start(0.1)
+            --core.log("Starting timer for miner")
+            core.get_node_timer(pos):start(5)
         end
     end
 end)
