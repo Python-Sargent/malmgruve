@@ -69,7 +69,15 @@ mg_factory.manufactory.manufacturer_formspec = function(pos)
     end
     local manufactures = ""
     for i,v in ipairs(m_recipes) do
-        manufactures = manufactures .. "item_image_button["..i..",0;1,1;"..v.result..";"..v.result..";]"
+        local y = 0
+        local x = 0
+        if i > 8 then
+            x = i-9
+            y = 1
+        else
+            x = i-1
+        end
+        manufactures = manufactures .. "item_image_button["..x..","..y..";1,1;"..v.result..";"..v.result..";]"
     end
     local inv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
     local formspec = "size[8,8.5]"..
