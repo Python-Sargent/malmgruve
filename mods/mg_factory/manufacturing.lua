@@ -106,6 +106,14 @@ mg_factory.register_recipe("mg_factory:manufacturer", {
     result = "mg_factory:manufacturer"
 })
 
+mg_factory.register_recipe("mg_factory:miner", {
+    type = "specific",
+    amount = 1,
+    machine = "manufacturing",
+    requires = {"mg_core:tungsten_sheet 2", "mg_core:diamond"},
+    result = "mg_factory:miner"
+})
+
 --[[
 mg_factory.register_recipe("mg_core:iron", {
     type = "single",

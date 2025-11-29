@@ -46,13 +46,13 @@ produce["mg_factory:compressor"] = {price=515}
 produce["mg_factory:furnace"] = {price=510}
 produce["mg_factory:engine"] = {price=520}
 
---[[
 produce["mg_factory:chamber"] = {price=115+100}
 produce["mg_factory:centrifuge"] = {price=110+100}
 produce["mg_factory:reactor"] = {price=120+100}
-]]
+
 
 produce["mg_factory:manufacturer"] = {price=127+103} -- base sale-equalized price + manufactured offset factor
+produce["mg_factory:manufacturer"] = {price=500}
 
 produce["mg_carts:cart"] = {price=171+104}
 produce["mg_carts:rail_straight"] = {price=82+103}

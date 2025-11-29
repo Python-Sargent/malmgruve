@@ -27,7 +27,7 @@ core.register_on_joinplayer(function(player, last_login)
 end)
 
 core.register_on_dignode(function(pos, oldnode, digger)
-    if mg_core.ores.registered_ores[oldnode.name] ~= nil then
+    if mg_core.ores.registered_ores[oldnode.name] ~= nil and digger ~= nil and digger:is_player() then
         local meta = digger:get_meta()
         local key = string.split(oldnode.name, ":")
         key = key[1] .. " " .. key[2]

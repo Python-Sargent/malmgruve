@@ -87,6 +87,19 @@ mg_factory.manufactory.manufacturer_formspec = function(pos)
     return formspec
 end
 
+mg_factory.manufactory.miner_formspec = function(pos)
+    local inv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
+    local formspec = "size[8,8.5]"..
+    "field[0,0;0,0;pos;;"..core.pos_to_string(pos).."]" ..
+    "list[" .. inv ..";msi;2,1;4,2;]"..
+    "button[2,3.25;4,1;activate;Start]" ..
+    "list[current_player;main;0,4.25;8,1;]"..
+    "list[current_player;main;0,5.5;8,3;8]" ..
+    "listring[current_player;main]" ..
+    "listring[" .. inv ..";msi]"
+    return formspec
+end
+
 mg_factory.manufactory.register_machine = function(name, def, overrides)
     local function can_dig(pos, player)
         local inv = core.get_meta(pos):get_inventory()
@@ -225,7 +238,8 @@ mg_factory.manufactory.register_machine("manufactory_on", {
 ]]
 
 local manufacture_particles = function(pos)
-    local texture = core.registered_nodes[core.get_node(pos).name].tiles[1]
+    local tiles = core.registered_nodes[core.get_node(pos).name].tiles or {"mg_machine_generic_metal.png"}
+    local texture = tiles[1]
     core.add_particlespawner({
         amount = 300,
         time = 1,
@@ -630,6 +644,75 @@ mg_factory.manufactory.register_machine("manufacturer", {
     end,
 }, {})
 
+local miner_positions = {}
+local miner_size = {x=16, y=128, z=16}
+
+for y=-1,-miner_size.y,-1 do
+    for x=-math.round(miner_size.x/2),miner_size.x,1 do
+        for z=-math.round(miner_size.z/2),miner_size.z,1 do
+            table.insert(miner_positions, vector.new(x, y, z))
+        end
+    end
+end
+
+mg_factory.manufactory.register_machine("miner", {
+    description = "Quarry Miner",
+    mesh = "mg_miner.obj",
+    tiles = {"mg_machine_generic_metal.png", "mg_machine_generic_frame.png"},
+    machine = {type="user", num = 1, active = false},
+    formspec = mg_factory.manufactory.miner_formspec,
+    inventories = {
+        {name="msi", size=8}
+    },
+    on_timer = function(pos, elapsed, node, timeout)
+        local meta = core.get_meta(pos)
+        local index =  meta:get_int("ind")
+        if index == 0 then index = 1 end
+
+        if index <= #miner_positions then
+            local machines = get_nearby_machines(pos)
+            local discharge = nil
+            for _,v in pairs(machines) do
+                local n = core.get_node(v)
+                if mg_factory.manufactory.machines[n.name].num == 2 then
+                    discharge = v
+                    break
+                end
+            end
+            if discharge == nil then return false end -- no power sources nearby
+            local dmeta = core.get_meta(discharge)
+            if dmeta:get_int("power") < 1 then return true end -- not enough power
+            dmeta:set_int("power", dmeta:get_int("power") - 1)
+
+            local a = true -- loop around if air until it hits smth other than air
+            while a do
+                local p = miner_positions[index]
+                if p ~= nil then
+                    local node = core.get_node(vector.add(pos, p))
+                    if node.name ~= "air" then
+                        local inv = meta:get_inventory()
+                        local stack = ItemStack(core.registered_nodes[node.name].drop or node.name)
+                        if inv:room_for_item("msi", stack) then
+                            inv:add_item("msi", stack)
+                            core.remove_node(vector.add(pos, p))
+                            manufacture_particles(vector.add(pos, p))
+                        else
+                            index = index - 1 -- go back to the same node until the inventory is emptied
+                        end
+                        a = false
+                    else
+                        index = index + 1
+                    end
+                end
+            end
+
+            meta:set_int("ind", index + 1)
+            return true -- keep mining
+        end
+        return false -- stop mining, it has reached the end
+    end,
+}, {})
+
 core.register_on_player_receive_fields(function(player, formname, fields)
     if formname == "manufacturer" then
         local item = nil
@@ -651,6 +734,15 @@ core.register_on_player_receive_fields(function(player, formname, fields)
         core.get_meta(pos):set_string("mod", itm[1])
         core.get_meta(pos):set_string("item", itm[2])
         core.get_node_timer(pos):start(1)
+    elseif formname == "miner" then
+        local pos = nil
+        if fields.pos then
+            pos = core.string_to_pos(fields.pos)
+        end
+        if fields.activate and pos ~= nil then
+            core.log("Starting timer for miner")
+            core.get_node_timer(pos):start(0.1)
+        end
     end
 end)
 
