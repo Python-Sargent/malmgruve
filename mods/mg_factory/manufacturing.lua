@@ -86,7 +86,7 @@ mg_factory.register_recipe("mg_factory:reactor", {
     type = "specific",
     amount = 1,
     machine = "manufacturing",
-    requires = {"mg_core:tungsten 2", "mg_core:cobalt_sheet2"},
+    requires = {"mg_core:tungsten 2", "mg_core:cobalt_sheet 2"},
     result = "mg_factory:reactor"
 })
 
