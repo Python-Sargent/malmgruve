@@ -2,18 +2,18 @@
 local produce = {}
 
 local ore_prices = {
-    ["metal"] = 20,
-    ["crystaline"] = 30,
-    ["strata"] = 35,
-    ["gem"] = 40
+    ["metal"] = 5,
+    ["crystaline"] = 8,
+    ["strata"] = 10,
+    ["gem"] = 15
 }
 
 local level_prices = {
     [0] = 0,
-    [1] = 10,
-    [2] = 23,
-    [3] = 38,
-    [4] = 50
+    [1] = 20,
+    [2] = 50,
+    [3] = 80,
+    [4] = 100
 }
 
 local rate = 0.9
@@ -37,25 +37,25 @@ end
 produce["mg_mining:dynamite"] = {price=500}
 
 -- Mechanical
-produce["mg_factory:roller"] = {price=215}
-produce["mg_factory:mill"] = {price=210}
-produce["mg_factory:crank"] = {price=220}
+produce["mg_factory:roller"] = {price=190}
+produce["mg_factory:mill"] = {price=180}
+produce["mg_factory:crank"] = {price=200}
 
 --Hydrothermal
-produce["mg_factory:compressor"] = {price=515}
-produce["mg_factory:furnace"] = {price=510}
-produce["mg_factory:engine"] = {price=520}
+produce["mg_factory:compressor"] = {price=315}
+produce["mg_factory:furnace"] = {price=300}
+produce["mg_factory:engine"] = {price=330}
 
-produce["mg_factory:chamber"] = {price=115+100}
-produce["mg_factory:centrifuge"] = {price=110+100}
-produce["mg_factory:reactor"] = {price=120+100}
+produce["mg_factory:chamber"] = {price=500}
+produce["mg_factory:centrifuge"] = {price=480}
+produce["mg_factory:reactor"] = {price=520}
 
 
-produce["mg_factory:manufacturer"] = {price=127+103} -- base sale-equalized price + manufactured offset factor
-produce["mg_factory:miner"] = {price=500}
+produce["mg_factory:manufacturer"] = {price=400} -- base sale-equalized price + manufactured offset factor
+produce["mg_factory:miner"] = {price=600}
 
-produce["mg_carts:cart"] = {price=171+104}
-produce["mg_carts:rail_straight"] = {price=82+103}
+produce["mg_carts:cart"] = {price=200}
+produce["mg_carts:rail_straight"] = {price=150}
 
 produce["mg_core:bag"] = {price=10000}
 produce["mg_core:brick"] = {price=20}
@@ -132,8 +132,9 @@ local handle_fields = function(player, fields, item_action)
     if fields.scroll ~= nil then
         meta:set_int("shop_scroll", string.split(fields.scroll, ":")[2])
     end
-    if fields.filter ~= nil then
+    if fields.filter ~= nil and fields.filter ~= "" then
         meta:set_string("shop_filter", fields.filter)
+        meta:set_int("shop_scroll", 0)
     end
     if fields.quit then
         meta:set_int("shop_scroll", 0)
