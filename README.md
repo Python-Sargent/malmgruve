@@ -90,8 +90,9 @@ The levels are:
   * Sapphire (-900)
 * Mantle (Peridotite)
   * Chromium (-1000)
-  * Platinum (-1100)
-  * Diamond (-1200)
+  * Uranium (-1100)
+  * Platinum (-1200)
+  * Diamond (-1300)
   * Graphite (-1400)
   * Olivine (-1500)
 

@@ -45,6 +45,7 @@ local cobalt = core.get_content_id("mg_core:quartz_with_cobalt")
 local gold = core.get_content_id("mg_core:quartz_with_gold")
 
 local chromium = core.get_content_id("mg_core:peridotite_with_chromium")
+local uranium = core.get_content_id("mg_core:peridotite_with_uranium")
 local platinum = core.get_content_id("mg_core:peridotite_with_platinum")
 local graphite = core.get_content_id("mg_core:peridotite_with_graphite")
 
@@ -88,8 +89,9 @@ local ores = {
     {-900, sapphire},
 
     {-1000, chromium},
-    {-1100, platinum},
-    {-1200, diamond},
+    {-1100, uranium},
+    {-1200, platinum},
+    {-1300, diamond},
     {-1400, graphite},
     {-1500, olivine},
     {-32000, olivine}

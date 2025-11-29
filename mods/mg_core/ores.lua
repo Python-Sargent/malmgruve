@@ -142,12 +142,6 @@ mg_core.ores.register_ore({
 }, {})
 
 mg_core.ores.register_ore({
-    name="uranium",
-    level=2,
-    type="metal",
-}, {light_source=5})
-
-mg_core.ores.register_ore({
     name="argentite",
     level=2,
     type="metal",
@@ -198,6 +192,12 @@ mg_core.ores.register_ore({
     level=4,
     type="metal",
 }, {})
+
+mg_core.ores.register_ore({
+    name="uranium",
+    level=4,
+    type="metal",
+}, {light_source=5})
 
 mg_core.ores.register_ore({
     name="platinum",
