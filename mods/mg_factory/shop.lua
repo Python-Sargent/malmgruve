@@ -52,7 +52,7 @@ produce["mg_factory:reactor"] = {price=120+100}
 
 
 produce["mg_factory:manufacturer"] = {price=127+103} -- base sale-equalized price + manufactured offset factor
-produce["mg_factory:manufacturer"] = {price=500}
+produce["mg_factory:miner"] = {price=500}
 
 produce["mg_carts:cart"] = {price=171+104}
 produce["mg_carts:rail_straight"] = {price=82+103}

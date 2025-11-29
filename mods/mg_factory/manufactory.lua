@@ -187,7 +187,30 @@ mg_factory.manufactory.register_machine = function(name, def, overrides)
     mg_factory.manufactory.machines["mg_factory:" .. name] = {is_active = def.machine.active, name = def.name, num = def.machine.num}
 end
 
+local manufacture_particles = function(pos)
+    local tiles = core.registered_nodes[core.get_node(pos).name].tiles or {"mg_machine_generic_metal.png"}
+    local texture = tiles[1]
+    core.add_particlespawner({
+        amount = 300,
+        time = 1,
+        collisiondetection = true,
+        --object_collision = true,
+
+        pos = {
+            min = vector.new(pos.x-0.6,pos.y-0.6,pos.z-0.6),
+            max = vector.new(pos.x+0.6,pos.y+0.6,pos.z+0.6),
+            bias = 0
+        },
+        acc = vector.new(0, -1, -10),
+        size = { min = 0.5, max = 1 },
+        exptime = { min = 0.5, max = 1 },
+        glow = 10,
+        texture = texture
+    })
+end
+
 local function generate(pos, amount)
+    manufacture_particles(pos)
     local meta = core.get_meta(pos)
     local power = meta:get_int("power")
     local capacity = meta:get_int("capacity")
@@ -236,28 +259,6 @@ mg_factory.manufactory.register_machine("manufactory_on", {
     inventories = {}
 }, {groups={diggable=1, machine=3, not_in_creative_inventory=1}})
 ]]
-
-local manufacture_particles = function(pos)
-    local tiles = core.registered_nodes[core.get_node(pos).name].tiles or {"mg_machine_generic_metal.png"}
-    local texture = tiles[1]
-    core.add_particlespawner({
-        amount = 300,
-        time = 1,
-        collisiondetection = true,
-        --object_collision = true,
-
-        pos = {
-            min = vector.new(pos.x-0.6,pos.y-0.6,pos.z-0.6),
-            max = vector.new(pos.x+0.6,pos.y+0.6,pos.z+0.6),
-            bias = 0
-        },
-        acc = vector.new(0, -1, -10),
-        size = { min = 0.5, max = 1 },
-        exptime = { min = 0.5, max = 1 },
-        glow = 10,
-        texture = texture
-    })
-end
 
 local manufacture_item = function(pos, type)
     local meta = core.get_meta(pos)
@@ -477,7 +478,6 @@ mg_factory.manufactory.register_machine("engine", {
         local fuel = ItemStack("mg_core:raw_coal")
 
         if inv:contains_item("fuel", fuel) and meta:get_int("power") <= meta:get_int("capacity") - 10 then
-            manufacture_particles(pos)
             inv:remove_item("fuel", fuel)
             local meta = generate(pos, 10)
             meta:set_string("formspec", mg_factory.manufactory.generator_formspec(pos))
