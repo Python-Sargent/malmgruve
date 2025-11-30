@@ -13,7 +13,7 @@ core.register_on_mods_loaded(function()
                 "With it you can process materials and manufacture machines and utilities.",
                 "",
                 "<style size='18'><b>CONTENTS</b>",
-                "1 Machine Tiers\n2 Manufacturing\n3 Exchange\n4 Geologic Levels\n5 Carts and Rails",
+                "1 Machine Tiers\n2 Power\n3 Manufacturing\n4 Exchange\n5 Geologic Levels\n6 Carts and Rails\n7 Exploring",
                 "</style>",
                 "<style size='18'><b>MACHINE TIERS</b></style>",
                 "There are three levels or tiers of machines, each with three machines:", 
@@ -40,6 +40,11 @@ core.register_on_mods_loaded(function()
                 "It will continue once its' inventory is emptied enough to continue running.",
                 "The miner consumes 1 power per node dug and instantly places it in it's inventory.",
                 "It's size is 16x16 nodes wide and 128 nodes deep, and it's starts from the top.",
+                "",
+                "<style size='18'><b>POWER</b></style>",
+                "Manufactory machines are powered by generators, to power a machine place it by a generator.",
+                "If the generator has power then the machine will receive power from it.",
+                "Machines must be placed on one of the 6 sides of the generator node.",
                 "",
                 "<style size='18'><b>MANUFACTURING</b></style>",
                 "Recipes for manufacturing these machines and materials\nare provided in the Recipes tab of your inventory.",
@@ -107,7 +112,14 @@ core.register_on_mods_loaded(function()
                 "",
                 "<style size='18'><b>INVENTORY</b></style>",
                 "Bags will expand the inventory to the default size when equipped in the bag slot.",
-                "Bags can be bought from the Store."
+                "Bags can be bought from the Store.",
+                "",
+                "<style size='18'><b>EXPLORING</b></style>",
+                "The surface in Malmgruve is procedurally generated using value noise.",
+                "Besides some bushes there is little to find on the surface.", 
+                "Below the surface however there are caves which allow for easy access to ores.",
+                "To help you min easier there are big blocks of dynamite which can be bought.",
+                "Right-click one of these to light it, and right-click again to stop the fuse."
             }
 
             local content = ""
